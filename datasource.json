@@ -1,0 +1,11 @@
+{
+    "name": "Elielson",
+    "title": "Backend Developer Specialist",
+    "projects": [    {
+        "name": "Portfolio",
+        "description": "Personal site with GitHub Actions automation",
+        "link": "https://me.elielsonms.com"
+      }
+    ],
+    "skills": ["Java", "Kotlin", "JavaScript",  "Node.js", "Docker", "AWS"]
+  }

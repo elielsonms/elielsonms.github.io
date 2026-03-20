@@ -34,6 +34,22 @@ header {
 .whatsapp-link:hover { background: #128c7e; transform: translateY(-1px); }
 .whatsapp-icon { font-size: 1.2rem; }
 
+.download-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  font-weight: 600;
+}
+
+.download-link:hover {
+  background: rgba(255, 255, 255, 0.26);
+  transform: translateY(-1px);
+}
+
 /* Main sections */
 main { padding: 2rem; }
 section { margin-bottom: 2.5rem; }
@@ -77,6 +93,29 @@ section h2 {
   background: linear-gradient(135deg, #0a66c2 0%, #005a9c 100%); 
   color: white; padding: 0.6rem 1.2rem; border-radius: 24px; 
   font-size: 0.95rem; font-weight: 500;
+}
+
+#download-section {
+  background: linear-gradient(135deg, #f7fbff 0%, #edf4ff 100%);
+  border: 1px solid #d9e7fb;
+  border-radius: 12px;
+  padding: 1.4rem;
+}
+
+.download-copy {
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.download-cta {
+  margin: 0;
+}
+
+#download-section .download-link {
+  background: linear-gradient(135deg, #0a66c2 0%, #005a9c 100%);
+  border: none;
+  color: white;
+  text-decoration: none;
 }
 
 /* Responsive */

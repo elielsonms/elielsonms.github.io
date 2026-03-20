@@ -9,6 +9,11 @@ on:
       - 'styles/main.css'
       - 'scripts/email-reveal.js'
       - 'scripts/generate-html.js'
+      - 'scripts/generate_pdf.py'
+      - 'scripts/run-python.sh'
+      - 'scripts/render-portfolio.js'
+      - 'package.json'
+      - 'requirements.txt'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -43,17 +48,24 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-      
-      - name: Create dist directory
-        run: mkdir -p dist/styles dist/scripts
-      
-      - name: Generate HTML
-        run: node scripts/generate-html.js
 
-      - name: Copy static assets
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
         run: |
-          cp styles/main.css dist/styles/main.css
-          cp scripts/email-reveal.js dist/scripts/email-reveal.js
+          python3 -m venv .venv
+          .venv/bin/pip install -r requirements.txt
+      
+      - name: Prepare dist directory
+        run: |
+          rm -rf dist
+          mkdir -p dist/styles dist/scripts
+
+      - name: Build site
+        run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

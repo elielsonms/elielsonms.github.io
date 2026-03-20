@@ -1,5 +1,5 @@
 const fs = require('fs');
-const data = JSON.parse(fs.readFileSync('../dados.json', 'utf8'));
+const data = JSON.parse(fs.readFileSync('../datasource.json', 'utf8'));
 const template = fs.readFileSync('../public/index.html', 'utf8');
 
 function obfuscateEmail(parts) {

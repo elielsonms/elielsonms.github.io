@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - 'datasource.json'
+      - 'public/index.html'
+      - 'styles/main.css'
+      - 'scripts/email-reveal.js'
       - 'scripts/generate-html.js'
 
   # Allows you to run this workflow manually from the Actions tab
@@ -42,14 +45,16 @@ jobs:
           node-version: '18'
       
       - name: Create dist directory
-        run: mkdir -p dist
+        run: mkdir -p dist/styles dist/scripts
       
       - name: Generate HTML
         run: node scripts/generate-html.js
-      
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      
+
+      - name: Copy static assets
+        run: |
+          cp styles/main.css dist/styles/main.css
+          cp scripts/email-reveal.js dist/scripts/email-reveal.js
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

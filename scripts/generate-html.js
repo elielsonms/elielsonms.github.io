@@ -1,10 +1,27 @@
 const fs = require('fs');
-const data = JSON.parse(fs.readFileSync('../datasource.json', 'utf8'));
-const template = fs.readFileSync('../public/index.html', 'utf8');
+const data = JSON.parse(fs.readFileSync('datasource.json', 'utf8'));
+const template = fs.readFileSync('public/index.html', 'utf8');
 
 function obfuscateEmail(parts) {
-  const email = parts.join('@');
-  return `<span class="email-obfuscated" data-email="${email}">${parts.split('').join('&#8203;')}</span><span>&#64;</span><span>${parts[1]}</span>`;
+  const [localPart, domain] = parts;
+  const email = `${localPart}@${domain}`;
+  const obfuscatedEmail = email.split('').join('&#8203;');
+  const localCodes = localPart.split('').map(char => char.charCodeAt(0)).join(',');
+  const domainCodes = domain.split('').map(char => char.charCodeAt(0)).join(',');
+
+  return `<span class="email-obfuscated" data-local-codes="${localCodes}" data-domain-codes="${domainCodes}">${obfuscatedEmail}</span>`;
+}
+
+function injectContent(html, id, content) {
+  const elementRegex = new RegExp(
+    `(<[^>]+id="${id}"[^>]*>)([\\s\\S]*?)(</[^>]+>)`
+  );
+
+  if (!elementRegex.test(html)) {
+    throw new Error(`Template marker not found: ${id}`);
+  }
+
+  return html.replace(elementRegex, `$1${content}$3`);
 }
 
 // Header
@@ -41,14 +58,30 @@ const expHtml = data.experience.map(exp => `
   </div>
 `).join('');
 
-// ... outros templates (education, certs, skills) ...
+const educationHtml = data.education.map(edu => `
+  <div class="edu-item">
+    <div class="edu-degree">${edu.degree}</div>
+    <div class="edu-institution">${edu.institution}</div>
+    <div class="edu-year">${edu.year}</div>
+  </div>
+`).join('');
 
-const finalHtml = template
-  .replace('{{NAME}}', data.header.name)
-  .replace('#header-template', headerHtml)
-  .replace('#summary-content', data.summary)
-  .replace('#experience-list', expHtml)
-  // ... outros replaces ...
+const certificationsHtml = data.certifications.map(cert => `
+  <div class="cert-item">${cert}</div>
+`).join('');
 
-fs.writeFileSync('../dist/index.html', finalHtml);
-console.log('✅ Portfolio gerado (HTML/CSS/JS separados)!');
+const skillsHtml = data.skills.map(skill => `
+  <span class="skill">${skill}</span>
+`).join('');
+
+let finalHtml = template.replace('{{NAME}}', data.header.name);
+
+finalHtml = injectContent(finalHtml, 'header-template', headerHtml);
+finalHtml = injectContent(finalHtml, 'summary-content', data.summary);
+finalHtml = injectContent(finalHtml, 'experience-list', expHtml);
+finalHtml = injectContent(finalHtml, 'education-list', educationHtml);
+finalHtml = injectContent(finalHtml, 'certs-list', certificationsHtml);
+finalHtml = injectContent(finalHtml, 'skills-list', skillsHtml);
+
+fs.writeFileSync('dist/index.html', finalHtml);
+console.log('✅ Portfolio generated!');

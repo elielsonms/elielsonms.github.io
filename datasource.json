@@ -22,22 +22,17 @@
         ]
     },
     {
-        "title": "Backend ",
-        "company": "Tracfone",
+        "title": "Backend Engineer Specialist",
+        "company": "Tracfone (oursourced by Marlabs)",
         "period": "Dec 2023 - Mar 2026",
         "duration": "1 year and 8 months",
-        "description": "Building and maintaining microservices for Banco Inter SuperApp Backend Platform. Variable Income Squad focus.",
-        "highlights": [
-            "Micronaut framework with REST endpoints",
-            "SQS/SNS event processing",
-            "MongoDB data layer",
-            "GitLab merge request reviews"
-        ]
+        "description": "Building new feature and maitaining existing microservices for the department I was allocated. Supporting external partners that consumed our services with doubts or addressing fixes",
+        "highlights": []
     },
       {
         "title": "Dev Specialist 1",
         "company": "Inter",
-        "period": "Apr 2022 - Present",
+        "period": "Apr 2022 - Nov 2023",
         "duration": "11 months",
         "description": "Building and maintaining microservices for Banco Inter SuperApp Backend Platform. Variable Income Squad focus.",
         "highlights": [

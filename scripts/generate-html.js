@@ -1,51 +1,54 @@
 const fs = require('fs');
-const data = JSON.parse(fs.readFileSync('datasource.json', 'utf8'));
+const data = JSON.parse(fs.readFileSync('../dados.json', 'utf8'));
+const template = fs.readFileSync('../public/index.html', 'utf8');
 
-const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${data.name} - Portfolio</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 2rem; }
-    h1 { font-size: 2.5rem; color: #1a1a1a; margin-bottom: 0.5rem; }
-    .title { color: #666; font-size: 1.2rem; margin-bottom: 2rem; }
-    h2 { color: #333; margin: 2rem 0 1rem; }
-    .project { border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; transition: box-shadow 0.3s; }
-    .project:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    .project h3 { color: #007bff; margin-bottom: 0.5rem; }
-    .project a { color: #007bff; text-decoration: none; font-weight: 500; }
-    .skills { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
-    .skill { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>${data.name}</h1>
-    <p class="title">${data.title}</p>
-  </header>
-  
-  <section>
-    <h2>Projects</h2>
-    ${data.projects.map(p => `
-      <div class="project">
-        <h3>${p.name}</h3>
-        <p>${p.description}</p>
-        <a href="${p.link}" target="_blank" rel="noopener">View on GitHub →</a>
+function obfuscateEmail(parts) {
+  const email = parts.join('@');
+  return `<span class="email-obfuscated" data-email="${email}">${parts.split('').join('&#8203;')}</span><span>&#64;</span><span>${parts[1]}</span>`;
+}
+
+// Header
+const headerHtml = `
+  <div class="header-left">
+    <h1>${data.header.name}</h1>
+    <p>${data.header.title}</p>
+  </div>
+  <div class="header-right">
+    <p>${data.header.location}</p>
+    <p>${obfuscateEmail(data.header.email_parts)}</p>
+    <p>
+      <a href="https://wa.me/${data.header.whatsapp}" class="whatsapp-link" target="_blank" rel="noopener">
+        <span class="whatsapp-icon">📱</span> WhatsApp
+      </a>
+    </p>
+  </div>
+`;
+
+// Experience items
+const expHtml = data.experience.map(exp => `
+  <div class="experience-item">
+    <div class="exp-header">
+      <div>
+        <div class="exp-title">${exp.title}</div>
+        <div class="exp-company">${exp.company}</div>
       </div>
-    `).join('')}
-  </section>
-  
-  <section>
-    <h2>Skills</h2>
-    <div class="skills">
-      ${data.skills.map(s => `<span class="skill">${s}</span>`).join('')}
+      <div class="exp-period">${exp.period}</div>
     </div>
-  </section>
-</body>
-</html>`;
+    <div class="exp-description">${exp.description}</div>
+    <div class="highlights">
+      ${exp.highlights.map(h => `<span class="highlight">${h}</span>`).join('')}
+    </div>
+  </div>
+`).join('');
 
-fs.writeFileSync('dist/index.html', html);
-console.log('✅ Portfolio generated!');
+// ... outros templates (education, certs, skills) ...
+
+const finalHtml = template
+  .replace('{{NAME}}', data.header.name)
+  .replace('#header-template', headerHtml)
+  .replace('#summary-content', data.summary)
+  .replace('#experience-list', expHtml)
+  // ... outros replaces ...
+
+fs.writeFileSync('../dist/index.html', finalHtml);
+console.log('✅ Portfolio gerado (HTML/CSS/JS separados)!');

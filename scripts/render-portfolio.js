@@ -131,20 +131,36 @@ function renderSkills(skills, tagName = 'span') {
 function renderWebHtml(data) {
   const template = readTemplate('public/index.html');
   const pdfFileName = buildPdfFileName(data.header.name);
+  const githubHtml = data.header.github
+    ? `
+    <a href="https://github.com/${escapeHtml(data.header.github)}" class="github-link action-link" target="_blank" rel="noopener">
+      GitHub
+    </a>`
+    : '';
 
   const headerHtml = `
   <div class="header-left">
+    <div class="header-eyebrow">Portfolio</div>
     <h1>${escapeHtml(data.header.name)}</h1>
-    <p>${escapeHtml(data.header.title)}</p>
+    <p class="header-role">${escapeHtml(data.header.title)}</p>
   </div>
   <div class="header-right">
-    <p>${escapeHtml(data.header.location)}</p>
-    <p>${obfuscateEmail(data.header.email_parts)}</p>
-    <p>
-      <a href="https://wa.me/${escapeHtml(data.header.whatsapp)}" class="whatsapp-link" target="_blank" rel="noopener">
-        <span class="whatsapp-icon">📱</span> WhatsApp
+    <div class="header-meta">
+      <div class="header-meta-item">
+        <span class="meta-label">Location</span>
+        <span class="meta-value">${escapeHtml(data.header.location)}</span>
+      </div>
+      <div class="header-meta-item">
+        <span class="meta-label">Email</span>
+        <span class="meta-value">${obfuscateEmail(data.header.email_parts)}</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      ${githubHtml}
+      <a href="https://wa.me/${escapeHtml(data.header.whatsapp)}" class="whatsapp-link action-link" target="_blank" rel="noopener">
+        WhatsApp
       </a>
-    </p>
+    </div>
   </div>
 `;
 

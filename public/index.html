@@ -1,10 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{HTML_LANG}}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{NAME}} - Portfolio</title>
+  <title>{{PAGE_TITLE}}</title>
+  <meta name="description" content="{{META_DESCRIPTION}}">
+  <meta name="keywords" content="{{META_KEYWORDS}}">
+  <meta name="author" content="{{NAME}}">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="{{CANONICAL_URL}}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{PAGE_TITLE}}">
+  <meta property="og:description" content="{{META_DESCRIPTION}}">
+  <meta property="og:url" content="{{CANONICAL_URL}}">
+  <meta property="og:site_name" content="{{SITE_NAME}}">
+  <meta property="og:locale" content="{{OG_LOCALE}}">
+  {{OG_IMAGE_TAG}}
+  <meta name="twitter:card" content="{{TWITTER_CARD}}">
+  <meta name="twitter:title" content="{{PAGE_TITLE}}">
+  <meta name="twitter:description" content="{{META_DESCRIPTION}}">
+  {{TWITTER_IMAGE_TAG}}
+  {{GOOGLE_SITE_VERIFICATION_TAG}}
+  {{STRUCTURED_DATA}}
   <link rel="stylesheet" href="./styles/main.css">
+  {{ANALYTICS_HEAD}}
 </head>
 <body>
   <div class="container">

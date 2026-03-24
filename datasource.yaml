@@ -7,7 +7,28 @@ header:
     - gmail.com
   whatsapp: "5571988596796"
   github: elielsonms
-  portfolio: https://elielsonms.github.io
+  portfolio: http://me.elielsonms.com
+
+site:
+  url: http://me.elielsonms.com
+  locale: en_US
+  title: Elielson Machado Silva | Full Stack Developer
+  description: >
+    Full stack developer focused on Java, cloud architecture, microservices,
+    and scalable backend systems.
+  keywords:
+    - Elielson Machado Silva
+    - Full Stack Developer
+    - Java Developer
+    - Backend Developer
+    - Cloud Developer
+    - Microservices
+    - Portfolio
+  social_image: ""
+  google_site_verification: ""
+
+analytics:
+  google_measurement_id: "G-3CTF4QF4XT"
 
 summary: >
   I'm a curious and experienced web developer, having started working with Software development on 2007. I'm a Java 8 Certified (2018) and Cloud

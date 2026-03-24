@@ -64,6 +64,22 @@ function buildPdfFileName(name) {
   return `${slugifyFileName(name)}.pdf`;
 }
 
+function normalizeBaseUrl(url) {
+  return String(url || '').replace(/\/+$/, '');
+}
+
+function joinUrl(baseUrl, pathname = '') {
+  const base = normalizeBaseUrl(baseUrl);
+  const pathPart = String(pathname || '').replace(/^\/+/, '');
+  return pathPart ? `${base}/${pathPart}` : base;
+}
+
+function normalizeText(value) {
+  return String(value || '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function escapeHtml(value) {
   return String(value)
     .replace(/&/g, '&amp;')
@@ -71,6 +87,13 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+function escapeJsonForHtml(value) {
+  return JSON.stringify(value)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026');
 }
 
 function applyTemplateReplacements(template, replacements) {
@@ -138,9 +161,79 @@ function renderSkills(skills, tagName = 'span') {
   <${tagName} class="skill">${escapeHtml(skill)}</${tagName}>`).join('');
 }
 
+function buildAnalyticsHead(data) {
+  const measurementId = data.analytics?.google_measurement_id;
+
+  if (!measurementId) {
+    return '';
+  }
+
+  return `
+  <script async src="https://www.googletagmanager.com/gtag/js?id=${escapeHtml(measurementId)}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '${escapeHtml(measurementId)}');
+  </script>`;
+}
+
+function buildStructuredData(data, canonicalUrl) {
+  const site = data.site || {};
+  const portfolioUrl = data.header.portfolio || site.url || canonicalUrl;
+  const email = `${data.header.email_parts[0]}@${data.header.email_parts[1]}`;
+  const sameAs = [
+    data.header.github ? `https://github.com/${data.header.github}` : null,
+    portfolioUrl || null
+  ].filter(Boolean);
+
+  const payload = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: data.header.name,
+    url: portfolioUrl,
+    email: `mailto:${email}`,
+    jobTitle: data.header.title,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: data.header.location
+    },
+    sameAs
+  };
+
+  return `<script type="application/ld+json">${escapeJsonForHtml(payload)}</script>`;
+}
+
+function renderRobotsTxt(data) {
+  const siteUrl = normalizeBaseUrl(data.site?.url || data.header.portfolio);
+
+  return `User-agent: *\nAllow: /\n\nSitemap: ${siteUrl}/sitemap.xml\n`;
+}
+
+function renderSitemapXml(data) {
+  const siteUrl = normalizeBaseUrl(data.site?.url || data.header.portfolio);
+  const homepage = joinUrl(siteUrl, '');
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${escapeHtml(homepage)}</loc>
+  </url>
+</urlset>
+`;
+}
+
 function renderWebHtml(data) {
   const template = readTemplate('public/index.html');
   const pdfFileName = buildPdfFileName(data.header.name);
+  const site = data.site || {};
+  const canonicalUrl = normalizeBaseUrl(site.url || data.header.portfolio);
+  const siteTitle = site.title || `${data.header.name} - Portfolio`;
+  const metaDescription = normalizeText(site.description || data.summary);
+  const metaKeywords = Array.isArray(site.keywords) ? site.keywords.join(', ') : '';
+  const htmlLang = String(site.locale || 'en_US').split('_')[0] || 'en';
+  const ogLocale = site.locale || 'en_US';
+  const socialImage = site.social_image ? joinUrl(canonicalUrl, site.social_image) : '';
   const githubHtml = data.header.github
     ? `
     <a href="https://github.com/${escapeHtml(data.header.github)}" class="inline-link subtle-link" target="_blank" rel="noopener">
@@ -186,7 +279,26 @@ function renderWebHtml(data) {
 
   let finalHtml = applyTemplateReplacements(template, {
     '{{NAME}}': escapeHtml(data.header.name),
-    '{{PDF_FILE_NAME}}': escapeHtml(pdfFileName)
+    '{{PDF_FILE_NAME}}': escapeHtml(pdfFileName),
+    '{{HTML_LANG}}': escapeHtml(htmlLang),
+    '{{PAGE_TITLE}}': escapeHtml(siteTitle),
+    '{{META_DESCRIPTION}}': escapeHtml(metaDescription),
+    '{{META_KEYWORDS}}': escapeHtml(metaKeywords),
+    '{{CANONICAL_URL}}': escapeHtml(canonicalUrl),
+    '{{SITE_NAME}}': escapeHtml(data.header.name),
+    '{{OG_LOCALE}}': escapeHtml(ogLocale),
+    '{{OG_IMAGE_TAG}}': socialImage
+      ? `<meta property="og:image" content="${escapeHtml(socialImage)}">`
+      : '',
+    '{{TWITTER_CARD}}': socialImage ? 'summary_large_image' : 'summary',
+    '{{TWITTER_IMAGE_TAG}}': socialImage
+      ? `<meta name="twitter:image" content="${escapeHtml(socialImage)}">`
+      : '',
+    '{{GOOGLE_SITE_VERIFICATION_TAG}}': site.google_site_verification
+      ? `<meta name="google-site-verification" content="${escapeHtml(site.google_site_verification)}">`
+      : '',
+    '{{STRUCTURED_DATA}}': buildStructuredData(data, canonicalUrl),
+    '{{ANALYTICS_HEAD}}': buildAnalyticsHead(data)
   });
   finalHtml = injectContent(finalHtml, 'header-template', headerHtml);
   finalHtml = injectContent(finalHtml, 'summary-content', escapeHtml(data.summary));
@@ -197,7 +309,9 @@ function renderWebHtml(data) {
 
   return {
     html: finalHtml,
-    pdfFileName
+    pdfFileName,
+    robotsTxt: renderRobotsTxt(data),
+    sitemapXml: renderSitemapXml(data)
   };
 }
 

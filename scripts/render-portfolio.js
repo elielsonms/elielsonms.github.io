@@ -1,8 +1,18 @@
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 function loadData() {
-  return JSON.parse(fs.readFileSync(path.join(process.cwd(), 'datasource.json'), 'utf8'));
+  const output = execFileSync(
+    'sh',
+    ['scripts/run-python.sh', 'scripts/print_data_json.py'],
+    {
+      cwd: process.cwd(),
+      encoding: 'utf8'
+    }
+  );
+
+  return JSON.parse(output);
 }
 
 function readTemplate(relativePath) {
@@ -133,16 +143,24 @@ function renderWebHtml(data) {
   const pdfFileName = buildPdfFileName(data.header.name);
   const githubHtml = data.header.github
     ? `
-    <a href="https://github.com/${escapeHtml(data.header.github)}" class="github-link action-link" target="_blank" rel="noopener">
+    <a href="https://github.com/${escapeHtml(data.header.github)}" class="inline-link subtle-link" target="_blank" rel="noopener">
       GitHub
     </a>`
     : '';
+  const downloadHtml = `
+    <a href="./${escapeHtml(pdfFileName)}" class="inline-link subtle-link" download target="_blank">
+      PDF Resume
+    </a>`;
 
   const headerHtml = `
   <div class="header-left">
     <div class="header-eyebrow">Portfolio</div>
     <h1>${escapeHtml(data.header.name)}</h1>
     <p class="header-role">${escapeHtml(data.header.title)}</p>
+    <div class="header-secondary-links">
+      ${githubHtml}
+      ${downloadHtml}
+    </div>
   </div>
   <div class="header-right">
     <div class="header-meta">
@@ -154,12 +172,14 @@ function renderWebHtml(data) {
         <span class="meta-label">Email</span>
         <span class="meta-value">${obfuscateEmail(data.header.email_parts)}</span>
       </div>
-    </div>
-    <div class="header-actions">
-      ${githubHtml}
-      <a href="https://wa.me/${escapeHtml(data.header.whatsapp)}" class="whatsapp-link action-link" target="_blank" rel="noopener">
-        WhatsApp
-      </a>
+      <div class="header-meta-item">
+        <span class="meta-label">WhatsApp</span>
+        <span class="meta-value">
+          <a href="https://wa.me/${escapeHtml(data.header.whatsapp)}" class="meta-link" target="_blank" rel="noopener">
+            +${escapeHtml(data.header.whatsapp)}
+          </a>
+        </span>
+      </div>
     </div>
   </div>
 `;

@@ -4,12 +4,13 @@ on:
   push:
     branches: [main]
     paths:
-      - 'datasource.json'
+      - 'datasource.yaml'
       - 'public/index.html'
       - 'styles/main.css'
       - 'scripts/email-reveal.js'
       - 'scripts/generate-html.js'
       - 'scripts/generate_pdf.py'
+      - 'scripts/print_data_json.py'
       - 'scripts/run-python.sh'
       - 'scripts/render-portfolio.js'
       - 'package.json'

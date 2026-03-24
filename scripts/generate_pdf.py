@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import json
 import re
 import unicodedata
 from pathlib import Path
 from xml.sax.saxutils import escape
 
+import yaml
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_LEFT, TA_RIGHT
 from reportlab.lib.pagesizes import A4
@@ -56,6 +56,24 @@ def get_styles():
             leading=10.2,
             alignment=TA_RIGHT,
             textColor=colors.HexColor("#374151"),
+        ),
+        "contact_link_right": ParagraphStyle(
+            "ContactLinkRight",
+            parent=base["BodyText"],
+            fontName="Helvetica",
+            fontSize=8.7,
+            leading=10.2,
+            alignment=TA_RIGHT,
+            textColor=colors.HexColor("#1d4ed8"),
+        ),
+        "contact_link_inline": ParagraphStyle(
+            "ContactLinkInline",
+            parent=base["BodyText"],
+            fontName="Helvetica",
+            fontSize=8.7,
+            leading=10.2,
+            alignment=TA_LEFT,
+            textColor=colors.HexColor("#1d4ed8"),
         ),
         "section": ParagraphStyle(
             "Section",
@@ -126,7 +144,7 @@ def get_styles():
     }
 
 
-def two_column_header(left_top: Paragraph, left_bottom: Paragraph, right_lines: list[Paragraph]):
+def two_column_header(left_top, left_bottom, right_lines):
     left_block = [left_top, left_bottom]
     right_block = right_lines
     table = Table([[left_block, right_block]], colWidths=[112 * mm, 68 * mm])
@@ -209,14 +227,43 @@ def build_education(education, styles):
     return flowables
 
 
+def build_link_paragraph(label: str, url: str, styles):
+    safe_label = escape(label)
+    safe_url = escape(url)
+    return Paragraph(f'<link href="{safe_url}">{safe_label}</link>', styles["contact_link_right"])
+
+
+def build_inline_links(urls: list[tuple[str, str]], styles):
+    cells = [
+        Paragraph(f'<link href="{escape(url)}">{escape(label)}</link>', styles["contact_link_inline"])
+        for label, url in urls
+    ]
+    table = Table([cells], colWidths=[28 * mm] * len(cells))
+    table.setStyle(
+        TableStyle(
+            [
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+                ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 12),
+                ("TOPPADDING", (0, 0), (-1, -1), 3),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+            ]
+        )
+    )
+    return table
+
+
 def main() -> None:
-    data = json.loads((ROOT / "datasource.json").read_text(encoding="utf-8"))
+    data = yaml.safe_load((ROOT / "datasource.yaml").read_text(encoding="utf-8"))
     pdf_file_name = slugify_file_name(data["header"]["name"])
     output_path = DIST_DIR / pdf_file_name
     DIST_DIR.mkdir(exist_ok=True)
 
     styles = get_styles()
     email = f"{data['header']['email_parts'][0]}@{data['header']['email_parts'][1]}"
+    github_url = f"https://github.com/{data['header']['github']}"
+    portfolio_url = data["header"].get("portfolio", "")
 
     doc = SimpleDocTemplate(
         str(output_path),
@@ -233,7 +280,16 @@ def main() -> None:
     story.append(
         two_column_header(
             Paragraph(escape(data["header"]["name"]), styles["name"]),
-            Paragraph(escape(data["header"]["title"]), styles["title"]),
+            [
+                Paragraph(escape(data["header"]["title"]), styles["title"]),
+                build_inline_links(
+                    [
+                        ("GitHub", github_url),
+                        ("Portfolio", portfolio_url),
+                    ] if portfolio_url else [("GitHub", github_url)],
+                    styles,
+                ),
+            ],
             [
                 Paragraph(escape(data["header"]["location"]), styles["contact_right"]),
                 Paragraph(escape(email), styles["contact_right"]),

@@ -1,7 +1,5 @@
 header:
   name: Elielson Machado Silva
-  title: Full Stack Developer | Java Specialist | Cloud Developer
-  location: Salvador, Bahia, Brazil
   email_parts:
     - elielsonms
     - gmail.com
@@ -11,258 +9,370 @@ header:
 
 site:
   url: http://me.elielsonms.com
-  locale: en_US
-  title: Elielson Machado Silva | Full Stack Developer
-  description: >
-    Full stack developer focused on Java, cloud architecture, microservices,
-    and scalable backend systems.
-  keywords:
-    - Elielson Machado Silva
-    - Full Stack Developer
-    - Java Developer
-    - Backend Developer
-    - Cloud Developer
-    - Microservices
-    - Portfolio
+  default_locale: en_US
+  supported_locales:
+    - en_US
+    - pt_BR
   social_image: ""
   google_site_verification: ""
 
 analytics:
   google_measurement_id: "G-3CTF4QF4XT"
 
-summary: >
-  I'm a curious and experienced web developer, having started working with Software development on 2007. I'm a Java 8 Certified (2018) and Cloud
-  Developer (2019). I'm passionate about microservices, cloud architecture and building scalable solutions, and since the AI freenzy, I've been
-  trying to get into it while also not let AI messy with the quality of what I deliver.
+locales:
+  en_US:
+    site:
+      locale: en_US
+      title: Elielson Machado Silva | Full Stack Developer
+      description: >
+        Full stack developer focused on Java, cloud architecture, microservices,
+        and scalable backend systems.
+      keywords:
+        - Elielson Machado Silva
+        - Full Stack Developer
+        - Java Developer
+        - Backend Developer
+        - Cloud Developer
+        - Microservices
+        - Portfolio
+    labels:
+      eyebrow: Portfolio
+      location: Location
+      email: Email
+      whatsapp: WhatsApp
+      about: About
+      experience: Experience
+      education: Education
+      certifications: Certifications & Awards
+      skills: Skills
+      pdf_resume: PDF Resume
+      github: GitHub
+      highlights: Highlights
+      portfolio_link: Portfolio
+      resume_title: Resume
+    header:
+      title: Full Stack Developer | Java Specialist | Cloud Developer
+      location: Salvador, Bahia, Brazil
+    summary: >
+      I'm a curious and experienced web developer, having started working with software development in 2007. I'm Java 8 Certified (2018). I'm passionate about microservices, cloud architecture, and building scalable solutions, and since the AI frenzy started I've been trying to get into it while not letting AI lower the quality of what I deliver.
+    experience:
+      - title: Backend Developer
+        company: Meridian (contractor via Revelo)
+        period: Jul 2024 - Mar 2026
+        duration: 1 year and 8 months
+        description: >
+          Worked as a contractor designing, building, and maintaining microservices, doing code reviews, production support, and some interaction with DevOps. I worked on several projects related to the company's mission of offering a cheap and simple way to do online payments.
+          Over time each engineer became responsible for one or more services, and I owned the Risk microservice and its integrations with external systems such as Sardine. I consistently used AI tools like Copilot and ChatGPT as side helpers, and in my last three months the company shifted to vibecoding with Codex agent.
+          Technologies included Temporal as workflow orchestrator, Kubernetes for microservice orchestration, Ktor + Coroutines for internal and external APIs, GraphQL for internal systems, and observability with Sentry, Micrometer, OpenTelemetry, Grafana, and Prometheus.
+        highlights:
+          - "Migration of a legacy platform from AWS Step Functions to Kotlin"
+          - "Integration with Slack API"
+      - title: Backend Engineer Specialist
+        company: Tracfone (contractor via Marlabs)
+        period: Dec 2023 - Mar 2026
+        duration: 1 year and 8 months
+        description: |
+          Built new features and maintained existing microservices for the department I was assigned to.
 
-experience:
-  - title: Backend Developer
-    company: Meridian (contractor by Revelo)
-    period: Jul 2024 - Mar 2026
-    duration: 1 year and 8 months
-    description: >
-      Worked as contractor, designing, building and maintaining microservices on the company, doing code reviews, prod support and some interaction with DevOps.
-      I worked on various projects related to the company's business, which is to offer a cheap and simple way to do online payments. 
-      Eventually each person was responsible for one or more service, and I was responsible for the Risk microservice and it's integration to external systems like Sardine. <br/>
-      Always using AI (Copilot and ChatGPT) as side helper, and on the last 3 months the company shifted into work with vibecode with Codex agent.
-      Used technologies like Temporal as Workflow Orchestrator, Kubernetes as Microservices orchestrator, Ktor + Coroutines for external and internal API's, Graphql as API for internal systems, 
-      Observability with Sentry, Micrometer (later replaced to OpenTelemetry), Grafana, Prometheus.
-    highlights:
-      - "Migration of legacy Platform with AWS Step function to Kotlin"
-      - "Integration to Slack api"
-
-  - title: Backend Engineer Specialist
-    company: Tracfone (contractor by Marlabs)
-    period: Dec 2023 - Mar 2026
-    duration: 1 year and 8 months
-    description: |
-      Building new features and maintaining existing microservices for the department I was allocated to.
-
-      Supporting external partners that consumed our services, clarifying doubts and addressing fixes.
-    highlights: 
-      - "Since the first day getting involed into bug fixes"
-
-  - title: Dev Specialist 1
-    company: Inter
-    period: Apr 2022 - Nov 2023
-    duration: 11 months
-    description: >
-      Building and maintaining microservices for Banco Inter SuperApp Backend Platform, on Variable Income Squad focus.
-    highlights:
-      - "Micronaut framework with REST endpoints"
-      - "SQS/SNS event processing"
-      - "MongoDB data layer"
-      - "GitLab merge request reviews"
-
-  - title: Senior Development Analyst
-    company: PlayKids
-    period: Apr 2021 - Mar 2022
-    duration: 1 year
-    description: >
-      Helped the team to build a Service-Mesh Platform to support the Company's business, built under DDD orientation,
-      running on a Kubernetes Cluster, using Kotlin, Python, TypeScript, and Golang aslanguages for the various components.
-      SpringBoot, Quarkus, and Node.JS as web platforms having RabbitMQ to declouple the componentes, CI/CD pipelines in GitHub Actions.
-      Some of the things that I did there:
-      - POCs with: AWS Cognito; Quarkus, GoLang as languages for our Kubernetes Cronjobs; and Automated Tests running on a docker-compose with RestAsured
-      - Built some SpringBoot and Quarkus applications from scratch using Kotlin, interacting with Postgres Database, RabbitMQ internal or external Services
-      - Wrote some Kubernetes Cronjobs in Python
-      - Class and Sequence diagrams for some flows
-      - Terraform code to generate an AWS Cognito User Pool and attach it to an API Gateway
-      - Some fixes and improvements on our Pipelines on GitHub actions
-      - Wrote some Kubernetes manifests
-      - Wrote code for our Integrations to external Services like Stripe API, Google Play Developer API, Vindi API, App Store Receipt Verification
-      - Configuration of RabbitMQ exchanges and queues and implementation of Consumers and Produces for them
-    highlights:
-      - "Multi-language stack: Kotlin, Python, TypeScript, Golang"
-      - "SpringBoot, Quarkus, Node.js applications"
-      - "RabbitMQ event decoupling"
-      - "GitHub Actions CI/CD pipelines"
-
-  - title: Senior Software Engineer
-    company: Footlocker (contractor by CI&T)
-    period: Oct 2020 - Mar 2021
-    duration: 6 months
-    description: >
-      Worked on a project to decouple some of their systems to integrate with a drop shipping partner,
-       creating Cloud applications with Apache Camel, Spring Boot, Kafka, and Cassandra. Hosting the applications at Azure AKS.
-      Things that I did:
-      - Wrote and fixed java code on the Apache Camel Java DSL and SpringBoot
-      - Supported to Client's QA during end-to-end tests for them to understand flows to create and execute
-      their scenarios
-      - Interacted with the Client's SRE/DevOps to fix some eventual issues on our Infra
-      - Maintained and created Azure Pipelines to support the CI/CD for the team.
-      - Created Automated Tests using Cucumber.
-    highlights: []
-
-  - title: Team Leader
-    company: Wex Brasil
-    period: Jul 2019 - Oct 2020
-    duration: 1 year 4 months
-    description: >
-      - Working remotely on the Brazilian Office, to an International Project, leading the local team to develop
-      the GraphQL API to interface the existing SOAP Service for one of the North America Fleet System of WEX.
-      - GraphQL, GraphQL Java, GraphQL Java Tools
+          Supported external partners consuming our services, clarifying questions and addressing fixes.
+        highlights:
+          - "Involved in production bug fixing from day one"
+      - title: Dev Specialist 1
+        company: Inter
+        period: Apr 2022 - Nov 2023
+        duration: 1 year and 7 months
+        description: >
+          Built and maintained microservices for Banco Inter's SuperApp backend platform, focused on the Variable Income squad.
+        highlights:
+          - "Micronaut framework with REST endpoints"
+          - "SQS/SNS event processing"
+          - "MongoDB data layer"
+          - "GitLab merge request reviews"
+      - title: Senior Development Analyst
+        company: PlayKids
+        period: Apr 2021 - Mar 2022
+        duration: 1 year
+        description: >
+          Helped the team build a service mesh platform to support the company's business, oriented around DDD and running on Kubernetes, using Kotlin, Python, TypeScript, and Golang across different components.
+          Spring Boot, Quarkus, and Node.js were used as application platforms, with RabbitMQ decoupling services and GitHub Actions pipelines supporting CI/CD.
+          I worked on POCs with AWS Cognito, Quarkus, Go cronjobs, and automated tests with docker-compose and RestAssured; built Spring Boot and Quarkus applications from scratch with Kotlin; wrote Python cronjobs and Kubernetes manifests; produced diagrams for some flows; created Terraform for Cognito and API Gateway; improved CI pipelines; and built integrations with Stripe, Google Play Developer API, Vindi, and App Store receipt validation.
+        highlights:
+          - "Multi-language stack: Kotlin, Python, TypeScript, Golang"
+          - "Spring Boot, Quarkus, and Node.js applications"
+          - "RabbitMQ event decoupling"
+          - "GitHub Actions CI/CD pipelines"
+      - title: Senior Software Engineer
+        company: Footlocker (contractor via CI&T)
+        period: Oct 2020 - Mar 2021
+        duration: 6 months
+        description: >
+          Worked on decoupling internal systems to integrate with a drop-shipping partner by creating cloud applications with Apache Camel, Spring Boot, Kafka, and Cassandra, hosted on Azure AKS.
+          I wrote and fixed Java code using Apache Camel Java DSL and Spring Boot, supported the client's QA team during end-to-end tests, worked with SRE and DevOps to resolve infrastructure issues, maintained Azure Pipelines, and created automated tests with Cucumber.
+        highlights: []
+      - title: Team Leader
+        company: Wex Brasil
+        period: Jul 2019 - Oct 2020
+        duration: 1 year and 4 months
+        description: >
+          Worked remotely from the Brazilian office on an international project, leading the local team responsible for building a GraphQL API to interface an existing SOAP service for one of WEX's North American fleet systems.
+          Stack included GraphQL, GraphQL Java Tools, Kotlin, Spring Boot, Spring Security, Apache CXF, JPA, H2, JUnit, YAML, Docker, AWS, Jenkins, Sonar, and Bitbucket-based CI/CD.
+        highlights: []
+      - title: Senior Developer
+        company: Wex Brasil
+        period: Aug 2017 - Jun 2019
+        duration: 1 year and 11 months
+        description: >
+          Worked remotely from the Brazilian office on one of WEX's North American fleet systems using Java EE, Spring WebFlow, Spring MVC, Spring Security, Apache Tiles, Bootstrap, SASS, SOAP, Apache CXF, MyBatis, Oracle, Git, and Tomcat 8.
+          I also supported feature development and bug fixes on WEX's Brazilian systems using Java EE, VRaptor, Spring Boot, SOAP, REST, JasperReports, Oracle, Quartz, Ant, Maven, GitLab, and Tomcat 7.
+        highlights: []
+      - title: Technical Lead
+        company: Fundação Luís Eduardo Magalhães
+        period: Jul 2015 - Jul 2017
+        duration: 2 years and 1 month
+        description: >
+          Analyzed and implemented demands for creating, improving, and fixing internal web systems. Supported internal users and took technical decisions while leading a small team composed of a trainee and a junior Java developer.
+        highlights: []
+      - title: System Analyst
+        company: Fundação Luís Eduardo Magalhães
+        period: Oct 2012 - Jul 2015
+        duration: 2 years and 10 months
+        description: >
+          Analyzed and implemented demands for creating, improving, and fixing internal web systems while also supporting users.
+          Stack included Java 7, Struts, JSF, PrimeFaces, Vaadin, Demoiselle, Hibernate, Quartz Scheduler, iReport, PHP, HTML, JavaScript, ASP Classic, Apache, Tomcat, Active Directory, MySQL, SQL Server, and Sybase.
+        highlights: []
+      - title: Java Web Developer
+        company: Fundação Escola Politécnica
+        period: Jun 2012 - Oct 2012
+        duration: 5 months
+        description: >
+          Worked for the Fraunhofer Project Center at UFBA on the development of a web system supporting Brazil's National Transplant System, using Java, J2EE, JSF, PrimeFaces, Spring WebFlow, JPA, and Oracle.
+        highlights: []
+      - title: Web Development Trainee
+        company: Convergence Works
+        period: Jan 2011 - Jun 2011
+        duration: 6 months
+        description: >
+          Built modules in the Typo3 CMS for a regional news portal using PHP, HTML, CSS, JavaScript, MySQL, Typo3, Facebook Graph API, and Twitter API.
+        highlights: []
+      - title: Web Developer
+        company: Companhia de Governança Eletrônica - COGEL
+        period: Aug 2007 - Dec 2010
+        duration: 3 years and 5 months
+        description: >
+          One year and one month as a web development intern, followed by two years as an outsourced developer.
+          Built web applications in PHP using Joomla CMS and CakePHP, with SQL Server, MySQL, and PostgreSQL databases, while also maintaining legacy ASP applications.
+        highlights: []
+      - title: Member
+        company: InfoJr - Empresa Júnior de Informática da UFBA
+        period: May 2007 - Dec 2009
+        duration: 2 years and 8 months
+        description: >
+          Junior company from UFBA where members grew technically through computer science projects and also worked across marketing, projects, finance, presidency, and council activities.
+          I participated in the Projects, Presidency, and Council areas, worked on CMS projects with Xoops and Joomla, built HTML, CSS, and JavaScript solutions, and modeled queries in MySQL and PostgreSQL databases.
+        highlights: []
+    education:
+      - degree: MBA - Software Engineering
+        institution: Centro Universitário Estácio da Bahia
+        year: 2016 - 2019
+      - degree: Bachelor of Computer Science
+        institution: Universidade Federal da Bahia
+        year: 2006 - 2011
+    certifications:
+      - Oracle Certified Associate, Java SE 8 Programmer
+      - Scrum Foundation Professional Certificate
+      - DevOps Essentials Professional Certificate
+      - Confluent Fundamentals for Apache Kafka
+    skills:
+      - Java
       - Kotlin
-      - Spring: SpringBoot, AOP, Security (OAUTH, JWT)
-      - Apache CXF
-      - JPA, H2
-      - JUnit
-      - YAML
-      - Git (Bitbucket)
-      - CI/CD with Bitbucket, Jenkins, Sonar, Docker, AWS
-      - AWS, ECS, EC2
-      - Maven
-    highlights: []
+      - Spring Boot
+      - Microservices
+      - Cloud Computing (AWS, Azure)
+      - Kubernetes
+      - Docker
+      - GraphQL
+      - REST APIs
+      - PostgreSQL
+      - MongoDB
+      - Apache Kafka
+      - RabbitMQ
+      - CI/CD
+      - Git
+  pt_BR:
+    site:
+      locale: pt_BR
+      title: Elielson Machado Silva | Desenvolvedor Full Stack
+      description: >
+        Desenvolvedor full stack com foco em Java, arquitetura em nuvem,
+        microsserviços e sistemas backend escaláveis.
+      keywords:
+        - Elielson Machado Silva
+        - Desenvolvedor Full Stack
+        - Desenvolvedor Java
+        - Desenvolvedor Backend
+        - Cloud Developer
+        - Microsserviços
+        - Portfólio
+    labels:
+      eyebrow: Portfólio
+      location: Localização
+      email: E-mail
+      whatsapp: WhatsApp
+      about: Sobre
+      experience: Experiência
+      education: Formação
+      certifications: Certificações e Premiações
+      skills: Habilidades
+      pdf_resume: Currículo em PDF
+      github: GitHub
+      highlights: Destaques
+      portfolio_link: Portfólio
+      resume_title: Currículo
+    header:
+      title: Desenvolvedor Full Stack | Especialista Java | Cloud Developer
+      location: Salvador, Bahia, Brasil
+    summary: >
+      Sou um desenvolvedor web curioso e experiente, trabalhando com desenvolvimento de software desde 2007. Tenho certificação Java 8 (2018). Sou apaixonado por microsserviços, arquitetura em nuvem e construção de soluções escaláveis, e desde a febre da IA venho tentando entrar mais nesse universo sem deixar que a IA reduza a qualidade do que entrego.
+    experience:
+      - title: Backend Developer
+        company: Meridian (contratado via Revelo)
+        period: jul. de 2024 - mar. de 2026
+        duration: 1 ano e 8 meses
+        description: >
+          Atuei como contratado desenhando, construindo e mantendo microsserviços, fazendo code review, suporte à produção e alguma interação com DevOps. Trabalhei em vários projetos ligados ao negócio da empresa, que é oferecer uma forma barata e simples de fazer pagamentos online.
+          Com o tempo cada pessoa ficou responsável por um ou mais serviços, e eu assumi o microsserviço de Risk e suas integrações com sistemas externos como Sardine. Usei ferramentas de IA como Copilot e ChatGPT como apoio no dia a dia, e nos meus três últimos meses a empresa migrou para vibecoding com agente Codex.
+          Entre as tecnologias estavam Temporal como orquestrador de workflow, Kubernetes para orquestração de microsserviços, Ktor + Coroutines em APIs internas e externas, GraphQL para sistemas internos e observabilidade com Sentry, Micrometer, OpenTelemetry, Grafana e Prometheus.
+        highlights:
+          - "Migração de plataforma legada de AWS Step Functions para Kotlin"
+          - "Integração com a API do Slack"
+      - title: Backend Engineer Specialist
+        company: Tracfone (contratado via Marlabs)
+        period: dez. de 2023 - mar. de 2026
+        duration: 2 anos e 4 meses
+        description: |
+          Construção de novas funcionalidades e manutenção de microsserviços existentes para a área em que fui alocado.
 
-  - title: Senior Developer
-    company: Wex Brasil
-    period: Aug 2017 - Jun 2019
-    duration: 1 year 11 months
-    description: >
-      - Working remotely on the Brazilian Office to one of the Wex North America Fleet systems:
-      - Java EE
-      - Spring WebFlow, WebMVC, Security, AOP
-      - Apache Tiles
-      - Bootsrap
-      - SASS
-      - SOAP
-      - Apache CXF
-      - MyBatis
-      - Oracle
-      - Git (Bitbucket)
-      - Tomcat 8
-
-      - Initially support the development of feature and bug fixes on Wex Brazilian systems. With
-      technologies:
-      - Java EE
-      - VRaptor
-      - SprintBoot
-      - SOAP
-      - REST
-      - Jasper Report
-      - Oracle
-      - Quartz
-      - Ant, Maven
-      - Git (GitLab)
-      - Tomcat 7
-    highlights: []
-
-  - title: Technical Lead
-    company: Fundação Luís Eduardo Magalhães
-    period: Jul 2015 - Jul 2017
-    duration: 2 years 1 month
-    description: >
-      Analyse and implement demands of create, improving and fix internal web systems. Support users of 
-      internal systems. Being responsible and take technical decisions leading a small team of a trainee and a Junior Java Developer
-    highlights: []
-
-  - title: System Analyst
-    company: Fundação Luís Eduardo Magalhães
-    period: Oct 2012 - Jul 2015
-    duration: 2 years 10 months
-    description: >
-      Analyse and implement demands of create, improving and fix internal web systems. Support users of internal systems.
-      Tech
-      - Java 7, Struts, JSF, Primefaces, Vaadin, Demoiselle, Hibernate, Quartz Scheduler, iReport
-      - PHP, HTML, JavaScript, Asp Classic
-      - Apache, Apache Tomcat, Active Directory
-      - MySQL, MS SQL server, SyBase
-    highlights: []
-
-  - title: Java Web Developer
-    company: Fundação Escola Politécnica
-    period: Jun 2012 - Oct 2012
-    duration: 5 months
-    description: >
-      Java Web developer, working for Fraunhofer Project Center at UFBA, on the development of a Web system for support the Sistema Nacional de Transplante
-      Tech
-      - Java, J2EE, JSF, PrimeFaces, Spring WebFlow, JPA
-      - Oracle
-    highlights: []
-
-  - title: Web Development Trainee
-    company: Convergence Works
-    period: Jan 2011 - Jun 2011
-    duration: 6 months
-    description: >
-      Coding modules in Typo3 CMS for a regional news portal
-      Tech used there:
-      - PHP, HTML, CSS, JavaScript
-      - MySQL
-      - Typo3
-      - Facebook Graph API, Twitter API
-    highlights: []
-  
-  - title: Web Developer
-    company: Companhia de Govenança Eletrônica - COGEL
-    period: Aug 2007 - Dec 2010
-    duration: 3 years 5 months
-    description: >
-      One year and one month of web developer intern, and two years as outsourced. 
-      Developing web applications in PHP using Joomla CMS and CakePHP framework, with MSSQL Server, MYSQL 
-      and PostgreSQL databases. Also giving maintenance in ASP applications
-    highlights: []
-
-  - title: Member
-    company: InfoJr - Empresa Júnior de Informática da UFBA
-    period: May 2007 - Dec 2009
-    duration: 2 years 8 months
-    description: >
-      Junior Computer Science Company of UFBA, where members develop technically in Computer Science projects and carry out activities within the Marketing, Projects, Finance, Presidency and Council Directorates.
-      I was part of the Projects, Presidency and Council directorates.
-      During this period I worked on projects in the CMS Xoops and Joomla. Projects in HTML, CSS and Javascript.
-      Modeling and creation of queries in MySQL and PostgreSQL databases.
-    highlights: []
-
-education:
-  - degree: MBA - Software Engineering
-    institution: Centro Universitário Estácio da Bahia
-    year: 2016 - 2019
-
-  - degree: Bachelor of Computer Science
-    institution: Universidade Federal da Bahia
-    year: 2006 - 2011
-
-certifications:
-  - Oracle Certified Associate, Java SE 8 Programmer
-  - AWS Certified Developer - Associate Level
-  - Scrum Foundation Professional Certificate
-  - DevOps Essentials Professional Certificate
-  - Confluent Fundamentals for Apache Kafka
-
-skills:
-  - Java
-  - Kotlin
-  - Spring Boot
-  - Microservices
-  - Cloud Computing (AWS, Azure)
-  - Kubernetes
-  - Docker
-  - GraphQL
-  - REST APIs
-  - PostgreSQL
-  - MongoDB
-  - Apache Kafka
-  - RabbitMQ
-  - CI/CD
-  - Git
+          Suporte a parceiros externos que consumiam nossos serviços, esclarecendo dúvidas e atuando em correções.
+        highlights:
+          - "Envolvido com correções de bugs em produção desde o primeiro dia"
+      - title: Dev Specialist 1
+        company: Inter
+        period: abr. de 2022 - nov. de 2023
+        duration: 1 ano e 7 meses
+        description: >
+          Construção e manutenção de microsserviços para a plataforma backend do SuperApp do Banco Inter, com foco na squad de Renda Variável.
+        highlights:
+          - "Micronaut com endpoints REST"
+          - "Processamento de eventos com SQS/SNS"
+          - "Camada de dados com MongoDB"
+          - "Revisões de merge request no GitLab"
+      - title: Senior Development Analyst
+        company: PlayKids
+        period: abr. de 2021 - mar. de 2022
+        duration: 1 ano
+        description: >
+          Ajudei o time a construir uma plataforma de service mesh para dar suporte ao negócio da empresa, orientada a DDD e executando em Kubernetes, usando Kotlin, Python, TypeScript e Golang em diferentes componentes.
+          Spring Boot, Quarkus e Node.js eram usados como plataformas de aplicação, com RabbitMQ desacoplando os serviços e GitHub Actions apoiando o CI/CD.
+          Trabalhei em POCs com AWS Cognito, Quarkus, cronjobs em Go e testes automatizados com docker-compose e RestAssured; construí aplicações Spring Boot e Quarkus do zero com Kotlin; escrevi cronjobs em Python e manifests de Kubernetes; produzi diagramas para alguns fluxos; criei Terraform para Cognito e API Gateway; melhorei pipelines de CI; e desenvolvi integrações com Stripe, Google Play Developer API, Vindi e validação de recibos da App Store.
+        highlights:
+          - "Stack multilíngue: Kotlin, Python, TypeScript, Golang"
+          - "Aplicações com Spring Boot, Quarkus e Node.js"
+          - "Desacoplamento de eventos com RabbitMQ"
+          - "Pipelines de CI/CD com GitHub Actions"
+      - title: Senior Software Engineer
+        company: Footlocker (contratado via CI&T)
+        period: out. de 2020 - mar. de 2021
+        duration: 6 meses
+        description: >
+          Atuei em um projeto para desacoplar sistemas internos e integrá-los a um parceiro de drop shipping, criando aplicações em nuvem com Apache Camel, Spring Boot, Kafka e Cassandra, hospedadas em Azure AKS.
+          Escrevi e corrigi código Java com Apache Camel Java DSL e Spring Boot, apoiei o time de QA do cliente durante testes end-to-end, trabalhei com SRE e DevOps para resolver problemas de infraestrutura, mantive Azure Pipelines e criei testes automatizados com Cucumber.
+        highlights: []
+      - title: Team Leader
+        company: Wex Brasil
+        period: jul. de 2019 - out. de 2020
+        duration: 1 ano e 4 meses
+        description: >
+          Trabalhei remotamente do escritório brasileiro em um projeto internacional, liderando o time local responsável por construir uma API GraphQL para interfacear um serviço SOAP existente de um dos sistemas de frota da WEX na América do Norte.
+          A stack incluía GraphQL, GraphQL Java Tools, Kotlin, Spring Boot, Spring Security, Apache CXF, JPA, H2, JUnit, YAML, Docker, AWS, Jenkins, Sonar e CI/CD com Bitbucket.
+        highlights: []
+      - title: Senior Developer
+        company: Wex Brasil
+        period: ago. de 2017 - jun. de 2019
+        duration: 1 ano e 11 meses
+        description: >
+          Trabalhei remotamente do escritório brasileiro em um dos sistemas de frota da WEX na América do Norte usando Java EE, Spring WebFlow, Spring MVC, Spring Security, Apache Tiles, Bootstrap, SASS, SOAP, Apache CXF, MyBatis, Oracle, Git e Tomcat 8.
+          Também dei suporte ao desenvolvimento de funcionalidades e correções nos sistemas brasileiros da WEX usando Java EE, VRaptor, Spring Boot, SOAP, REST, JasperReports, Oracle, Quartz, Ant, Maven, GitLab e Tomcat 7.
+        highlights: []
+      - title: Technical Lead
+        company: Fundação Luís Eduardo Magalhães
+        period: jul. de 2015 - jul. de 2017
+        duration: 2 anos e 1 mês
+        description: >
+          Analisei e implementei demandas para criação, melhoria e correção de sistemas web internos. Também dei suporte aos usuários internos e tomei decisões técnicas liderando um pequeno time formado por um trainee e um desenvolvedor Java júnior.
+        highlights: []
+      - title: System Analyst
+        company: Fundação Luís Eduardo Magalhães
+        period: out. de 2012 - jul. de 2015
+        duration: 2 anos e 10 meses
+        description: >
+          Analisei e implementei demandas para criação, melhoria e correção de sistemas web internos, além de dar suporte aos usuários.
+          A stack incluía Java 7, Struts, JSF, PrimeFaces, Vaadin, Demoiselle, Hibernate, Quartz Scheduler, iReport, PHP, HTML, JavaScript, ASP Classic, Apache, Tomcat, Active Directory, MySQL, SQL Server e Sybase.
+        highlights: []
+      - title: Java Web Developer
+        company: Fundação Escola Politécnica
+        period: jun. de 2012 - out. de 2012
+        duration: 5 meses
+        description: >
+          Atuei para o Fraunhofer Project Center da UFBA no desenvolvimento de um sistema web de apoio ao Sistema Nacional de Transplantes, usando Java, J2EE, JSF, PrimeFaces, Spring WebFlow, JPA e Oracle.
+        highlights: []
+      - title: Web Development Trainee
+        company: Convergence Works
+        period: jan. de 2011 - jun. de 2011
+        duration: 6 meses
+        description: >
+          Desenvolvi módulos em Typo3 CMS para um portal regional de notícias usando PHP, HTML, CSS, JavaScript, MySQL, Typo3, Facebook Graph API e Twitter API.
+        highlights: []
+      - title: Web Developer
+        company: Companhia de Governança Eletrônica - COGEL
+        period: ago. de 2007 - dez. de 2010
+        duration: 3 anos e 5 meses
+        description: >
+          Foram um ano e um mês como estagiário em desenvolvimento web e depois dois anos como terceirizado.
+          Desenvolvi aplicações web em PHP com Joomla CMS e CakePHP, usando bancos SQL Server, MySQL e PostgreSQL, além de manter aplicações legadas em ASP.
+        highlights: []
+      - title: Member
+        company: InfoJr - Empresa Júnior de Informática da UFBA
+        period: maio de 2007 - dez. de 2009
+        duration: 2 anos e 8 meses
+        description: >
+          Empresa júnior da UFBA em que os membros evoluíam tecnicamente em projetos de computação e também atuavam nas áreas de marketing, projetos, finanças, presidência e conselho.
+          Participei das diretorias de Projetos, Presidência e Conselho, trabalhei em projetos com Xoops e Joomla, construí soluções em HTML, CSS e JavaScript e modelei consultas em bancos MySQL e PostgreSQL.
+        highlights: []
+    education:
+      - degree: MBA - Engenharia de Software
+        institution: Centro Universitário Estácio da Bahia
+        year: 2016 - 2019
+      - degree: Bacharelado em Ciência da Computação
+        institution: Universidade Federal da Bahia
+        year: 2006 - 2011
+    certifications:
+      - Oracle Certified Associate, Java SE 8 Programmer
+      - Scrum Foundation Professional Certificate
+      - DevOps Essentials Professional Certificate
+      - Confluent Fundamentals for Apache Kafka
+    skills:
+      - Java
+      - Kotlin
+      - Spring Boot
+      - Microsserviços
+      - Computação em Nuvem (AWS, Azure)
+      - Kubernetes
+      - Docker
+      - GraphQL
+      - APIs REST
+      - PostgreSQL
+      - MongoDB
+      - Apache Kafka
+      - RabbitMQ
+      - CI/CD
+      - Git

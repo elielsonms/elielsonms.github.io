@@ -1,5 +1,5 @@
-document.addEventListener('DOMContentLoaded', function() {
-  const emails = document.querySelectorAll('.email-obfuscated');
+function revealObfuscatedEmails(root = document) {
+  const emails = root.querySelectorAll('.email-obfuscated');
 
   function decodeCodes(rawCodes) {
     return rawCodes
@@ -20,4 +20,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const email = `${decodeCodes(localCodes)}@${decodeCodes(domainCodes)}`;
     el.outerHTML = '<a href="mailto:' + email + '">' + email + '</a>';
   });
+}
+
+window.revealObfuscatedEmails = revealObfuscatedEmails;
+
+document.addEventListener('DOMContentLoaded', function() {
+  revealObfuscatedEmails();
 });

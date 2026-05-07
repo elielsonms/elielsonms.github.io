@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import re
 import unicodedata
 from pathlib import Path
@@ -58,11 +59,99 @@ def resolve_locale_data(data: dict, locale: str) -> dict:
         },
         "labels": locale_data.get("labels", {}),
         "summary": locale_data.get("summary", ""),
+        "resume_summary": locale_data.get("resume_summary", locale_data.get("summary", "")),
+        "resume_experience": locale_data.get("resume_experience", locale_data.get("experience", [])),
+        "resume_skills": locale_data.get("resume_skills", locale_data.get("skills", [])),
         "experience": locale_data.get("experience", []),
         "education": locale_data.get("education", []),
         "certifications": locale_data.get("certifications", []),
         "skills": locale_data.get("skills", []),
     }
+
+
+def parse_period_month_year(period: str, locale: str) -> tuple[tuple[int, int], tuple[int, int]] | None:
+    parts = [part.strip() for part in str(period).split(" - ")]
+    if len(parts) != 2:
+        return None
+
+    if locale == "pt_BR":
+        months = {
+            "jan.": 1,
+            "fev.": 2,
+            "mar.": 3,
+            "abr.": 4,
+            "maio": 5,
+            "jun.": 6,
+            "jul.": 7,
+            "ago.": 8,
+            "set.": 9,
+            "out.": 10,
+            "nov.": 11,
+            "dez.": 12,
+        }
+        parsed = []
+        for part in parts:
+            match = re.match(r"^(.+?) de (\d{4})$", part)
+            if not match or match.group(1) not in months:
+                return None
+            parsed.append((int(match.group(2)), months[match.group(1)]))
+        return parsed[0], parsed[1]
+
+    months = {
+        "Jan": 1,
+        "Feb": 2,
+        "Mar": 3,
+        "Apr": 4,
+        "May": 5,
+        "Jun": 6,
+        "Jul": 7,
+        "Aug": 8,
+        "Sep": 9,
+        "Oct": 10,
+        "Nov": 11,
+        "Dec": 12,
+    }
+    parsed = []
+    for part in parts:
+        match = re.match(r"^([A-Z][a-z]{2}) (\d{4})$", part)
+        if not match or match.group(1) not in months:
+            return None
+        parsed.append((int(match.group(2)), months[match.group(1)]))
+    return parsed[0], parsed[1]
+
+
+def format_duration_from_period(period: str, locale: str, fallback_duration: str = "") -> str:
+    parsed = parse_period_month_year(period, locale)
+    if not parsed:
+        return fallback_duration
+
+    (start_year, start_month), (end_year, end_month) = parsed
+    total_months = ((end_year - start_year) * 12) + (end_month - start_month)
+    if total_months < 0:
+        return fallback_duration
+
+    years = total_months // 12
+    months = total_months % 12
+
+    if locale == "pt_BR":
+        if years and months:
+            return f"{years} {'ano' if years == 1 else 'anos'} e {months} {'mês' if months == 1 else 'meses'}"
+        if years:
+            return f"{years} {'ano' if years == 1 else 'anos'}"
+        return f"{months} {'mês' if months == 1 else 'meses'}"
+
+    if years and months:
+        return f"{years} {'year' if years == 1 else 'years'} and {months} {'month' if months == 1 else 'months'}"
+    if years:
+        return f"{years} {'year' if years == 1 else 'years'}"
+    return f"{months} {'month' if months == 1 else 'months'}"
+
+
+def format_period_with_duration(period: str, locale: str, fallback_duration: str = "") -> str:
+    duration = format_duration_from_period(period, locale, fallback_duration)
+    if duration:
+        return f"{period} · {duration}"
+    return period
 
 
 def get_styles():
@@ -147,8 +236,8 @@ def get_styles():
             "MetaRight",
             parent=base["BodyText"],
             fontName="Helvetica-Bold",
-            fontSize=8.5,
-            leading=10,
+            fontSize=8.2,
+            leading=9.4,
             alignment=TA_RIGHT,
             textColor=colors.HexColor("#374151"),
         ),
@@ -206,13 +295,12 @@ def section_title(text: str, styles):
     return [Spacer(1, 5), Paragraph(escape(text.upper()), styles["section"]), HRFlowable(thickness=0.6, color=colors.HexColor("#cbd5e1"), spaceBefore=0, spaceAfter=5)]
 
 
-def build_experience(experiences, styles, highlights_label: str):
+def build_experience(experiences, styles, highlights_label: str, locale: str):
     flowables = []
     for exp in experiences:
         title = escape(exp["title"].strip())
         company = escape(exp["company"])
-        period = escape(exp["period"])
-        duration = escape(exp.get("duration", ""))
+        period = escape(format_period_with_duration(exp["period"], locale, exp.get("duration", "")))
         description = escape(exp["description"])
         highlights = exp.get("highlights", [])
 
@@ -221,7 +309,7 @@ def build_experience(experiences, styles, highlights_label: str):
                 Paragraph(f"{title} | {company}", styles["meta_left"]),
                 Paragraph(period, styles["meta_right"])
             ]],
-            colWidths=[118 * mm, 62 * mm],
+            colWidths=[108 * mm, 72 * mm],
         )
         header.setStyle(
             TableStyle(
@@ -236,8 +324,6 @@ def build_experience(experiences, styles, highlights_label: str):
         )
 
         block = [header]
-        if duration:
-            block.append(Paragraph(duration, styles["submeta"]))
         block.append(Paragraph(description, styles["body"]))
 
         if highlights:
@@ -250,8 +336,38 @@ def build_experience(experiences, styles, highlights_label: str):
     return flowables
 
 
-def build_simple_list(title: str, items: list[str], styles):
+def build_simple_list(title: str, items: list[str], styles, columns: int = 1, link: tuple[str, str] | None = None):
     flowables = section_title(title, styles)
+    if link:
+        flowables.append(build_link_paragraph(link[0], link[1], styles))
+    if columns > 1 and items:
+        row_count = math.ceil(len(items) / columns)
+        rows = []
+        for row_index in range(row_count):
+            row = []
+            for column_index in range(columns):
+                item_index = row_index + (column_index * row_count)
+                if item_index < len(items):
+                    row.append(Paragraph(escape(items[item_index]), styles["list"], bulletText="-"))
+                else:
+                    row.append("")
+            rows.append(row)
+
+        table = Table(rows, colWidths=[(92 * mm) / columns] * columns)
+        table.setStyle(
+            TableStyle(
+                [
+                    ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                    ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                    ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+                    ("TOPPADDING", (0, 0), (-1, -1), 0),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+                ]
+            )
+        )
+        flowables.append(table)
+        return flowables
+
     for item in items:
         flowables.append(Paragraph(escape(item), styles["list"], bulletText="-"))
     return flowables
@@ -345,14 +461,14 @@ def main() -> None:
         story.append(Spacer(1, 6))
         story.append(HRFlowable(thickness=0.8, color=colors.HexColor("#94a3b8"), spaceBefore=0, spaceAfter=6))
         story.extend(section_title(labels.get("about", "Summary"), styles))
-        story.append(Paragraph(escape(resolved["summary"]), styles["body"]))
-        story.extend(section_title(labels.get("experience", "Experience"), styles))
-        story.extend(build_experience(resolved["experience"], styles, labels.get("highlights", "Highlights")))
+        story.append(Paragraph(escape(resolved["resume_summary"]), styles["body"]))
+        story.extend(section_title(labels.get("selected_experience", labels.get("experience", "Experience")), styles))
+        story.extend(build_experience(resolved["resume_experience"], styles, labels.get("highlights", "Highlights"), locale))
 
         lower_table = Table(
             [[
                 build_education(labels.get("education", "Education"), resolved["education"], styles),
-                build_simple_list(labels.get("skills", "Skills"), resolved["skills"], styles),
+                build_simple_list(labels.get("skills", "Skills"), resolved["resume_skills"], styles, columns=2),
             ]],
             colWidths=[88 * mm, 92 * mm],
         )
@@ -368,7 +484,17 @@ def main() -> None:
             )
         )
         story.append(lower_table)
-        story.extend(build_simple_list(labels.get("certifications", "Certifications"), resolved["certifications"], styles))
+        story.extend(
+            build_simple_list(
+                labels.get("certifications", "Certifications"),
+                resolved["certifications"],
+                styles,
+                link=(
+                    labels.get("credly_badges", "View badge profile on Credly"),
+                    resolved["header"].get("credly_badges", ""),
+                ) if resolved["header"].get("credly_badges") else None,
+            )
+        )
 
         doc.build(story)
         print(f"✅ PDF generated: {pdf_file_name}")

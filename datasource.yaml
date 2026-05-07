@@ -6,6 +6,7 @@ header:
   whatsapp: "5571988596796"
   github: elielsonms
   portfolio: http://me.elielsonms.com
+  credly_badges: https://www.credly.com/users/elielson-machado-silva/badges
 
 site:
   url: http://me.elielsonms.com
@@ -50,11 +51,103 @@ locales:
       highlights: Highlights
       portfolio_link: Portfolio
       resume_title: Resume
+      resume_eyebrow: Resume
+      core_strengths: What a recruiter should see first
+      selected_experience: Selected Experience
+      technical_portfolio: Technical Portfolio
+      view_technical_portfolio: View technical portfolio
+      back_to_resume: Back to resume
+      technical_portfolio_blurb: Need the deeper technical version?
+      technical_portfolio_copy: Open the full portfolio page for architecture details, broader stack coverage, and the complete work history.
+      technical_page_title: Elielson Machado Silva | Technical Portfolio
+      technical_page_description: Detailed technical portfolio with full experience, architecture context, integrations, and stack breadth.
+      credly_badges: View badge profile on Credly
     header:
       title: Full Stack Developer | Java Specialist | Cloud Developer
       location: Salvador, Bahia, Brazil
+    resume_summary: >
+      Senior backend/full stack developer with 15+ years of experience, strongest in Java and Kotlin systems, APIs, cloud platforms, and distributed backend work.
+      Recent years have been centered on fintech, payments, production ownership, integrations, and collaboration across engineering, product, and support.
+    resume_highlights:
+      - 15+ years building and maintaining web and backend systems
+      - Strong recent focus on Java/Kotlin, fintech, payments, and microservices
+      - Comfortable owning services end to end, including production issues and external integrations
+      - Hands-on with cloud, containers, observability, messaging, code review, and team collaboration
+    resume_skills:
+      - Java
+      - Kotlin
+      - Spring Boot
+      - Ktor
+      - Micronaut
+      - Microservices
+      - AWS
+      - Kubernetes
+      - REST APIs
+      - GraphQL
+      - PostgreSQL
+      - MongoDB
+      - Apache Kafka
+      - RabbitMQ
+      - CI/CD
     summary: >
       I'm a curious and experienced web developer, having started working with software development in 2007. I'm Java 8 Certified (2018). I'm passionate about microservices, cloud architecture, and building scalable solutions, and since the AI frenzy started I've been trying to get into it while not letting AI lower the quality of what I deliver.
+    resume_experience:
+      - title: Backend Developer
+        company: Meridian (contractor via Revelo)
+        period: Jul 2024 - Mar 2026
+        duration: 1 year and 8 months
+        description: >
+          Owned backend services in a payments environment, covering design, implementation, code review, production support, and collaboration with DevOps.
+          Took responsibility for the Risk microservice and its integrations with external systems.
+        highlights:
+          - Temporal workflows
+          - Kubernetes
+          - Ktor + Coroutines
+          - Risk and payments integrations
+      - title: Backend Engineer Specialist
+        company: Tracfone (contractor via Marlabs)
+        period: Dec 2023 - May 2025
+        duration: 6 months
+        description: >
+          Delivered and maintained microservice features while also supporting external partners consuming the platform's services.
+          Worked close to production issues and partner-facing problem solving.
+        highlights:
+          - Microservice maintenance
+          - Partner support
+          - Production fixes
+      - title: Dev Specialist 1
+        company: Inter
+        period: Apr 2022 - Nov 2023
+        duration: 1 year and 7 months
+        description: >
+          Built and maintained backend services for Banco Inter's SuperApp platform, focused on the Variable Income domain.
+        highlights:
+          - Micronaut
+          - REST APIs
+          - SQS/SNS
+          - MongoDB
+      - title: Senior Development Analyst
+        company: PlayKids
+        period: Apr 2021 - Mar 2022
+        duration: 1 year
+        description: >
+          Helped build a service-oriented platform on Kubernetes, working across Kotlin, Python, TypeScript, and Go while contributing to integrations, automation, and CI/CD.
+        highlights:
+          - Spring Boot and Quarkus
+          - RabbitMQ
+          - GitHub Actions
+          - Stripe and mobile platform integrations
+      - title: Team Leader
+        company: Wex Brasil
+        period: Jul 2019 - Oct 2020
+        duration: 1 year and 4 months
+        description: >
+          Led the local team responsible for a GraphQL API that integrated legacy SOAP services for an international fleet platform.
+        highlights:
+          - Leadership
+          - GraphQL
+          - Kotlin + Spring Boot
+          - SOAP integration
     experience:
       - title: Backend Developer
         company: Meridian (contractor via Revelo)
@@ -70,7 +163,7 @@ locales:
       - title: Backend Engineer Specialist
         company: Tracfone (contractor via Marlabs)
         period: Dec 2023 - Mar 2026
-        duration: 1 year and 8 months
+        duration: 2 years and 4 months
         description: |
           Built new features and maintained existing microservices for the department I was assigned to.
 
@@ -228,11 +321,103 @@ locales:
       highlights: Destaques
       portfolio_link: Portfólio
       resume_title: Currículo
+      resume_eyebrow: Currículo
+      core_strengths: O que um recrutador deve ver primeiro
+      selected_experience: Experiência Selecionada
+      technical_portfolio: Portfólio Técnico
+      view_technical_portfolio: Ver portfólio técnico
+      back_to_resume: Voltar para o currículo
+      technical_portfolio_blurb: Quer a versão técnica completa?
+      technical_portfolio_copy: Abra a página técnica para ver mais contexto de arquitetura, stack, integrações e histórico completo.
+      technical_page_title: Elielson Machado Silva | Portfólio Técnico
+      technical_page_description: Portfólio técnico detalhado com experiência completa, contexto de arquitetura, integrações e stack.
+      credly_badges: Ver perfil de badges no Credly
     header:
       title: Desenvolvedor Full Stack | Especialista Java | Cloud Developer
       location: Salvador, Bahia, Brasil
+    resume_summary: >
+      Desenvolvedor backend/full stack sênior com mais de 15 anos de experiência, com maior força em sistemas Java e Kotlin, APIs, cloud e backend distribuído.
+      Nos anos mais recentes atuei principalmente em fintech, pagamentos, sustentação de produção, integrações e colaboração entre engenharia, produto e suporte.
+    resume_highlights:
+      - Mais de 15 anos construindo e mantendo sistemas web e backend
+      - Foco recente forte em Java/Kotlin, fintech, pagamentos e microsserviços
+      - Confortável assumindo serviços ponta a ponta, incluindo produção e integrações externas
+      - Experiência prática com cloud, containers, observabilidade, mensageria, code review e colaboração de time
+    resume_skills:
+      - Java
+      - Kotlin
+      - Spring Boot
+      - Ktor
+      - Micronaut
+      - Microsserviços
+      - AWS
+      - Kubernetes
+      - APIs REST
+      - GraphQL
+      - PostgreSQL
+      - MongoDB
+      - Apache Kafka
+      - RabbitMQ
+      - CI/CD
     summary: >
       Sou um desenvolvedor web curioso e experiente, trabalhando com desenvolvimento de software desde 2007. Tenho certificação Java 8 (2018). Sou apaixonado por microsserviços, arquitetura em nuvem e construção de soluções escaláveis, e desde a febre da IA venho tentando entrar mais nesse universo sem deixar que a IA reduza a qualidade do que entrego.
+    resume_experience:
+      - title: Backend Developer
+        company: Meridian (contratado via Revelo)
+        period: jul. de 2024 - mar. de 2026
+        duration: 1 ano e 8 meses
+        description: >
+          Assumi serviços backend em um contexto de pagamentos, cobrindo desenho, implementação, code review, suporte à produção e colaboração com DevOps.
+          Fiquei responsável pelo microsserviço de Risk e suas integrações com sistemas externos.
+        highlights:
+          - Workflows com Temporal
+          - Kubernetes
+          - Ktor + Coroutines
+          - Integrações de risk e pagamentos
+      - title: Backend Engineer Specialist
+        company: Tracfone (contratado via Marlabs)
+        period: dez. de 2023 - mai. de 2025
+        duration: 6 meses
+        description: >
+          Entreguei e mantive funcionalidades em microsserviços, além de apoiar parceiros externos que consumiam os serviços da plataforma.
+          Atuei próximo de problemas de produção e resolução de dúvidas operacionais.
+        highlights:
+          - Manutenção de microsserviços
+          - Suporte a parceiros
+          - Correções em produção
+      - title: Dev Specialist 1
+        company: Inter
+        period: abr. de 2022 - nov. de 2023
+        duration: 1 ano e 7 meses
+        description: >
+          Construção e manutenção de serviços backend para a plataforma do SuperApp do Banco Inter, com foco no domínio de Renda Variável.
+        highlights:
+          - Micronaut
+          - APIs REST
+          - SQS/SNS
+          - MongoDB
+      - title: Senior Development Analyst
+        company: PlayKids
+        period: abr. de 2021 - mar. de 2022
+        duration: 1 ano
+        description: >
+          Ajudei a construir uma plataforma orientada a serviços em Kubernetes, trabalhando com Kotlin, Python, TypeScript e Go em integrações, automações e CI/CD.
+        highlights:
+          - Spring Boot e Quarkus
+          - RabbitMQ
+          - GitHub Actions
+          - Integrações com Stripe e plataformas mobile
+      - title: Team Leader
+        company: Wex Brasil
+        period: jul. de 2019 - out. de 2020
+        duration: 1 ano e 4 meses
+        description: >
+          Liderei o time local responsável por uma API GraphQL que integrava serviços SOAP legados em uma plataforma internacional de frotas.
+        highlights:
+          - Liderança
+          - GraphQL
+          - Kotlin + Spring Boot
+          - Integração SOAP
     experience:
       - title: Backend Developer
         company: Meridian (contratado via Revelo)

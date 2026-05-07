@@ -113,8 +113,118 @@ function obfuscateEmail(parts) {
   return `<span class="email-obfuscated" data-local-codes="${localCodes}" data-domain-codes="${domainCodes}">${obfuscatedEmail}</span>`;
 }
 
+function parsePeriodMonthYear(period, locale) {
+  const normalizedLocale = String(locale || '');
+  const parts = String(period || '').split(' - ').map(part => part.trim());
+
+  if (parts.length !== 2) {
+    return null;
+  }
+
+  if (normalizedLocale === 'pt_BR') {
+    const months = {
+      'jan.': 1,
+      'fev.': 2,
+      'mar.': 3,
+      'abr.': 4,
+      'maio': 5,
+      'jun.': 6,
+      'jul.': 7,
+      'ago.': 8,
+      'set.': 9,
+      'out.': 10,
+      'nov.': 11,
+      'dez.': 12
+    };
+    const parsed = parts.map(part => {
+      const match = part.match(/^(.+?) de (\d{4})$/);
+
+      if (!match || !months[match[1]]) {
+        return null;
+      }
+
+      return {
+        month: months[match[1]],
+        year: Number(match[2])
+      };
+    });
+
+    return parsed.every(Boolean) ? parsed : null;
+  }
+
+  const months = {
+    Jan: 1,
+    Feb: 2,
+    Mar: 3,
+    Apr: 4,
+    May: 5,
+    Jun: 6,
+    Jul: 7,
+    Aug: 8,
+    Sep: 9,
+    Oct: 10,
+    Nov: 11,
+    Dec: 12
+  };
+  const parsed = parts.map(part => {
+    const match = part.match(/^([A-Z][a-z]{2}) (\d{4})$/);
+
+    if (!match || !months[match[1]]) {
+      return null;
+    }
+
+    return {
+      month: months[match[1]],
+      year: Number(match[2])
+    };
+  });
+
+  return parsed.every(Boolean) ? parsed : null;
+}
+
+function formatDurationFromPeriod(period, locale, fallbackDuration = '') {
+  const parsed = parsePeriodMonthYear(period, locale);
+
+  if (!parsed) {
+    return fallbackDuration || '';
+  }
+
+  const [start, end] = parsed;
+  const totalMonths = ((end.year - start.year) * 12) + (end.month - start.month);
+
+  if (totalMonths < 0) {
+    return fallbackDuration || '';
+  }
+
+  const years = Math.floor(totalMonths / 12);
+  const months = totalMonths % 12;
+
+  if (locale === 'pt_BR') {
+    if (years > 0 && months > 0) {
+      return `${years} ${years === 1 ? 'ano' : 'anos'} e ${months} ${months === 1 ? 'mês' : 'meses'}`;
+    }
+
+    if (years > 0) {
+      return `${years} ${years === 1 ? 'ano' : 'anos'}`;
+    }
+
+    return `${months} ${months === 1 ? 'mês' : 'meses'}`;
+  }
+
+  if (years > 0 && months > 0) {
+    return `${years} ${years === 1 ? 'year' : 'years'} and ${months} ${months === 1 ? 'month' : 'months'}`;
+  }
+
+  if (years > 0) {
+    return `${years} ${years === 1 ? 'year' : 'years'}`;
+  }
+
+  return `${months} ${months === 1 ? 'month' : 'months'}`;
+}
+
 function renderExperienceItems(experience, options = {}) {
   const highlightsLabel = options.highlightsLabel || 'Highlights';
+  const locale = options.locale || 'en_US';
 
   return experience.map(exp => {
     const highlights = Array.isArray(exp.highlights) ? exp.highlights : [];
@@ -126,9 +236,10 @@ function renderExperienceItems(experience, options = {}) {
     </div>`
       : '';
 
-    const durationHtml = options.showDuration && exp.duration
-      ? `<div class="exp-duration">${escapeHtml(exp.duration)}</div>`
-      : '';
+    const computedDuration = formatDurationFromPeriod(exp.period, locale, exp.duration);
+    const periodText = options.showDuration && computedDuration
+      ? `${exp.period} · ${computedDuration}`
+      : exp.period;
 
     return `
   <div class="experience-item">
@@ -138,8 +249,7 @@ function renderExperienceItems(experience, options = {}) {
         <div class="exp-company">${escapeHtml(exp.company)}</div>
       </div>
       <div class="exp-period-wrap">
-        <div class="exp-period">${escapeHtml(exp.period)}</div>
-        ${durationHtml}
+        <div class="exp-period">${escapeHtml(periodText)}</div>
       </div>
     </div>
     <div class="exp-description">${escapeHtml(exp.description)}</div>${highlightsHtml}
@@ -159,6 +269,18 @@ function renderEducationItems(education) {
 function renderCertifications(certifications, className = 'cert-item') {
   return certifications.map(cert => `
   <div class="${className}">${escapeHtml(cert)}</div>`).join('');
+}
+
+function renderCertificationsSection(resolved) {
+  const labels = resolved.labels || {};
+  const credlyUrl = resolved.header?.credly_badges;
+  const credlyHtml = credlyUrl
+    ? `<a class="certifications-link" href="${escapeHtml(credlyUrl)}" target="_blank" rel="noreferrer">`
+      + `${escapeHtml(labels.credly_badges || 'View badge profile on Credly')}`
+      + `</a>`
+    : '';
+
+  return `${credlyHtml}<div class="cert-list">${renderCertifications(resolved.certifications)}</div>`;
 }
 
 function renderSkills(skills, tagName = 'span') {
@@ -238,6 +360,10 @@ function resolveLocaleData(data, locale) {
       ...(localeData.site || {})
     },
     summary: localeData.summary || '',
+    resumeSummary: localeData.resume_summary || localeData.summary || '',
+    resumeHighlights: localeData.resume_highlights || [],
+    resumeExperience: localeData.resume_experience || localeData.experience || [],
+    resumeSkills: localeData.resume_skills || localeData.skills || [],
     experience: localeData.experience || [],
     education: localeData.education || [],
     certifications: localeData.certifications || [],
@@ -263,13 +389,13 @@ function renderRobotsTxt(data) {
 
 function renderSitemapXml(data) {
   const siteUrl = normalizeBaseUrl(data.site?.url || data.header.portfolio);
-  const homepage = joinUrl(siteUrl, '');
+  const pages = ['', 'portfolio.html'];
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>${escapeHtml(homepage)}</loc>
-  </url>
+${pages.map(page => `  <url>
+    <loc>${escapeHtml(joinUrl(siteUrl, page))}</loc>
+  </url>`).join('\n')}
 </urlset>
 `;
 }
@@ -294,20 +420,114 @@ function renderLanguageSwitcher(supportedLocales, activeLocale) {
     </div>`;
 }
 
-function buildLocaleView(data, locale) {
-  const resolved = resolveLocaleData(data, locale);
-  const defaultLocale = getDefaultLocale(data);
-  const pdfFileName = buildLocalizedPdfFileName(resolved.header.name, locale, defaultLocale);
-  const site = resolved.site || {};
+function renderSection(title, content, className = '') {
+  const sectionClass = className ? `content-section ${className}` : 'content-section';
+
+  return `
+    <section class="${sectionClass}">
+      <h2>${escapeHtml(title)}</h2>
+      ${content}
+    </section>`;
+}
+
+function renderStrengthCards(items) {
+  return items.map(item => `
+    <article class="strength-card">${escapeHtml(item)}</article>`).join('');
+}
+
+function buildResumeMainHtml(resolved) {
   const labels = resolved.labels || {};
-  const canonicalUrl = normalizeBaseUrl(site.url || resolved.header.portfolio);
-  const siteTitle = site.title || `${resolved.header.name} - Portfolio`;
-  const metaDescription = normalizeText(site.description || resolved.summary);
-  const metaKeywords = Array.isArray(site.keywords) ? site.keywords.join(', ') : '';
-  const htmlLang = String(site.locale || locale || 'en_US').split('_')[0] || 'en';
-  const ogLocale = site.locale || locale || 'en_US';
-  const socialImage = site.social_image ? joinUrl(canonicalUrl, site.social_image) : '';
-  const supportedLocales = getSupportedLocales(data);
+  const technicalPageLabel = labels.view_technical_portfolio || 'View technical portfolio';
+  const technicalPageBlurb = labels.technical_portfolio_blurb || 'Need the deep technical version?';
+
+  return [
+    renderSection(
+      labels.about || 'About',
+      `<div class="summary summary-compact">${escapeHtml(resolved.resumeSummary)}</div>
+      <div class="view-switch-banner">
+        <div>
+          <div class="view-switch-title">${escapeHtml(technicalPageBlurb)}</div>
+          <p class="view-switch-copy">${escapeHtml(labels.technical_portfolio_copy || 'Architecture, delivery details, broader stack, and full work history are available on a separate page.')}</p>
+        </div>
+        <a href="./portfolio.html" class="primary-link-pill" data-analytics-link="technical_portfolio">
+          ${escapeHtml(technicalPageLabel)}
+        </a>
+      </div>`
+    ),
+    renderSection(
+      labels.core_strengths || 'Core Strengths',
+      `<div class="strength-grid">${renderStrengthCards(resolved.resumeHighlights)}</div>`
+    ),
+    renderSection(
+      labels.selected_experience || labels.experience || 'Selected Experience',
+      renderExperienceItems(resolved.resumeExperience, {
+        highlightsLabel: labels.highlights || 'Highlights',
+        showDuration: true,
+        locale: resolved.locale
+      }),
+      'section-experience'
+    ),
+    renderSection(
+      labels.skills || 'Skills',
+      `<div class="skills-grid">${renderSkills(resolved.resumeSkills)}</div>`
+    ),
+    renderSection(
+      labels.education || 'Education',
+      renderEducationItems(resolved.education),
+      'section-education'
+    ),
+    renderSection(
+      labels.certifications || 'Certifications & Awards',
+      renderCertificationsSection(resolved),
+      'section-certifications'
+    )
+  ].join('');
+}
+
+function buildPortfolioMainHtml(resolved) {
+  const labels = resolved.labels || {};
+
+  return [
+    renderSection(
+      labels.about || 'About',
+      `<div class="summary">${escapeHtml(resolved.summary)}</div>`
+    ),
+    renderSection(
+      labels.experience || 'Experience',
+      renderExperienceItems(resolved.experience, {
+        highlightsLabel: labels.highlights || 'Highlights',
+        showDuration: true,
+        locale: resolved.locale
+      }),
+      'section-experience'
+    ),
+    renderSection(
+      labels.skills || 'Skills',
+      `<div class="skills-grid">${renderSkills(resolved.skills)}</div>`
+    ),
+    renderSection(
+      labels.education || 'Education',
+      renderEducationItems(resolved.education),
+      'section-education'
+    ),
+    renderSection(
+      labels.certifications || 'Certifications & Awards',
+      renderCertificationsSection(resolved),
+      'section-certifications'
+    )
+  ].join('');
+}
+
+function buildHeaderHtml({ resolved, locale, pageMode, supportedLocales, pdfFileName }) {
+  const labels = resolved.labels || {};
+  const isResumePage = pageMode === 'resume';
+  const pageEyebrow = isResumePage
+    ? (labels.resume_eyebrow || labels.resume_title || 'Resume')
+    : (labels.technical_portfolio || 'Technical Portfolio');
+  const pageSwitchHref = isResumePage ? './portfolio.html' : './index.html';
+  const pageSwitchLabel = isResumePage
+    ? (labels.view_technical_portfolio || 'View technical portfolio')
+    : (labels.back_to_resume || 'Back to resume');
   const githubHtml = resolved.header.github
     ? `
     <a href="https://github.com/${escapeHtml(resolved.header.github)}" class="inline-link subtle-link" target="_blank" rel="noopener" data-analytics-link="github">
@@ -319,15 +539,18 @@ function buildLocaleView(data, locale) {
       ${escapeHtml(labels.pdf_resume || 'PDF Resume')}
     </a>`;
 
-  const headerHtml = `
+  return `
   <div class="header-left">
     <div class="header-eyebrow-row">
-      <div class="header-eyebrow">${escapeHtml(labels.eyebrow || 'Portfolio')}</div>
+      <div class="header-eyebrow">${escapeHtml(pageEyebrow)}</div>
       ${renderLanguageSwitcher(supportedLocales, locale)}
     </div>
     <h1>${escapeHtml(resolved.header.name)}</h1>
     <p class="header-role">${escapeHtml(resolved.header.title)}</p>
     <div class="header-secondary-links">
+      <a href="${pageSwitchHref}" class="inline-link primary-subtle-link" data-analytics-link="${isResumePage ? 'technical_portfolio' : 'resume_page'}">
+        ${escapeHtml(pageSwitchLabel)}
+      </a>
       ${githubHtml}
       ${downloadHtml}
     </div>
@@ -353,10 +576,44 @@ function buildLocaleView(data, locale) {
     </div>
   </div>
 `;
+}
+
+function buildPageView(data, locale, pageMode) {
+  const resolved = resolveLocaleData(data, locale);
+  const defaultLocale = getDefaultLocale(data);
+  const pdfFileName = buildLocalizedPdfFileName(resolved.header.name, locale, defaultLocale);
+  const site = resolved.site || {};
+  const labels = resolved.labels || {};
+  const baseCanonicalUrl = normalizeBaseUrl(site.url || resolved.header.portfolio);
+  const canonicalUrl = pageMode === 'resume'
+    ? baseCanonicalUrl
+    : joinUrl(baseCanonicalUrl, 'portfolio.html');
+  const siteTitle = pageMode === 'resume'
+    ? (site.title || `${resolved.header.name} - Resume`)
+    : (labels.technical_page_title || `${resolved.header.name} | Technical Portfolio`);
+  const metaDescription = pageMode === 'resume'
+    ? normalizeText(site.description || resolved.resumeSummary)
+    : normalizeText(labels.technical_page_description || resolved.summary);
+  const metaKeywords = Array.isArray(site.keywords) ? site.keywords.join(', ') : '';
+  const htmlLang = String(site.locale || locale || 'en_US').split('_')[0] || 'en';
+  const ogLocale = site.locale || locale || 'en_US';
+  const socialImage = site.social_image ? joinUrl(canonicalUrl, site.social_image) : '';
+  const supportedLocales = getSupportedLocales(data);
+  const headerHtml = buildHeaderHtml({
+    resolved,
+    locale,
+    pageMode,
+    supportedLocales,
+    pdfFileName
+  });
+  const mainHtml = pageMode === 'resume'
+    ? buildResumeMainHtml(resolved)
+    : buildPortfolioMainHtml(resolved);
 
   return {
     locale,
     htmlLang,
+    pageMode,
     pageTitle: siteTitle,
     metaDescription,
     metaKeywords,
@@ -367,28 +624,23 @@ function buildLocaleView(data, locale) {
     labels,
     sections: {
       header: headerHtml,
-      summary: escapeHtml(resolved.summary),
-      experience: renderExperienceItems(resolved.experience, {
-        highlightsLabel: labels.highlights || 'Highlights'
-      }),
-      education: renderEducationItems(resolved.education),
-      certifications: renderCertifications(resolved.certifications),
-      skills: renderSkills(resolved.skills)
+      main: mainHtml
     }
   };
 }
 
-function renderWebHtml(data) {
+function renderPageHtml(data, pageMode) {
   const template = readTemplate('public/index.html');
   const defaultLocale = getDefaultLocale(data);
-  const defaultView = buildLocaleView(data, defaultLocale);
+  const defaultView = buildPageView(data, defaultLocale, pageMode);
   const localeViews = getSupportedLocales(data).reduce((acc, locale) => {
-    acc[locale] = buildLocaleView(data, locale);
+    acc[locale] = buildPageView(data, locale, pageMode);
     return acc;
   }, {});
 
   let finalHtml = applyTemplateReplacements(template, {
     '{{NAME}}': escapeHtml(data.header.name),
+    '{{PAGE_CLASS}}': escapeHtml(`page-${pageMode}`),
     '{{PDF_FILE_NAME}}': escapeHtml(defaultView.pdfFileName),
     '{{HTML_LANG}}': escapeHtml(defaultView.htmlLang),
     '{{PAGE_TITLE}}': escapeHtml(defaultView.pageTitle),
@@ -415,20 +667,15 @@ function renderWebHtml(data) {
     })};</script>`
   });
   finalHtml = injectContent(finalHtml, 'header-template', defaultView.sections.header);
-  finalHtml = injectContent(finalHtml, 'about-title', escapeHtml(defaultView.labels.about || 'About'));
-  finalHtml = injectContent(finalHtml, 'summary-content', defaultView.sections.summary);
-  finalHtml = injectContent(finalHtml, 'experience-title', escapeHtml(defaultView.labels.experience || 'Experience'));
-  finalHtml = injectContent(finalHtml, 'experience-list', defaultView.sections.experience);
-  finalHtml = injectContent(finalHtml, 'education-title', escapeHtml(defaultView.labels.education || 'Education'));
-  finalHtml = injectContent(finalHtml, 'education-list', defaultView.sections.education);
-  finalHtml = injectContent(finalHtml, 'certs-title', escapeHtml(defaultView.labels.certifications || 'Certifications & Awards'));
-  finalHtml = injectContent(finalHtml, 'certs-list', defaultView.sections.certifications);
-  finalHtml = injectContent(finalHtml, 'skills-title', escapeHtml(defaultView.labels.skills || 'Skills'));
-  finalHtml = injectContent(finalHtml, 'skills-list', defaultView.sections.skills);
+  finalHtml = injectContent(finalHtml, 'page-main', defaultView.sections.main);
 
+  return finalHtml;
+}
+
+function renderWebHtml(data) {
   return {
-    html: finalHtml,
-    pdfFileName: defaultView.pdfFileName,
+    html: renderPageHtml(data, 'resume'),
+    technicalHtml: renderPageHtml(data, 'portfolio'),
     robotsTxt: renderRobotsTxt(data),
     sitemapXml: renderSitemapXml(data)
   };

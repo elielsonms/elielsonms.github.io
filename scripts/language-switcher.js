@@ -64,19 +64,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.getElementById('header-template').innerHTML = view.sections.header;
-    document.getElementById('about-title').textContent = view.labels.about;
-    document.getElementById('summary-content').innerHTML = view.sections.summary;
-    document.getElementById('experience-title').textContent = view.labels.experience;
-    document.getElementById('experience-list').innerHTML = view.sections.experience;
-    document.getElementById('education-title').textContent = view.labels.education;
-    document.getElementById('education-list').innerHTML = view.sections.education;
-    document.getElementById('certs-title').textContent = view.labels.certifications;
-    document.getElementById('certs-list').innerHTML = view.sections.certifications;
-    document.getElementById('skills-title').textContent = view.labels.skills;
-    document.getElementById('skills-list').innerHTML = view.sections.skills;
+    document.getElementById('page-main').innerHTML = view.sections.main;
 
     if (window.revealObfuscatedEmails) {
-      window.revealObfuscatedEmails(document.getElementById('header-template'));
+      window.revealObfuscatedEmails(document.body);
     }
 
     currentLocale = locale;

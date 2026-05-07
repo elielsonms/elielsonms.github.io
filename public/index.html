@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="./styles/main.css">
   {{ANALYTICS_HEAD}}
 </head>
-<body>
+<body class="{{PAGE_CLASS}}">
   <div class="container">
     <!-- HEADER -->
     <header id="header-template">
@@ -33,37 +33,7 @@
     </header>
     
     <!-- MAIN -->
-    <main>
-      <!-- SUMMARY -->
-      <section id="about-section">
-        <h2 id="about-title"></h2>
-        <div id="summary-content" class="summary"></div>
-      </section>
-      
-      <!-- EXPERIENCE -->
-      <section id="experience-section">
-        <h2 id="experience-title"></h2>
-        <div id="experience-list"></div>
-      </section>
-      
-      <!-- EDUCATION -->
-      <section id="education-section">
-        <h2 id="education-title"></h2>
-        <div id="education-list"></div>
-      </section>
-      
-      <!-- CERTIFICATIONS -->
-      <section id="certs-section">
-        <h2 id="certs-title"></h2>
-        <div id="certs-list" class="cert-list"></div>
-      </section>
-      
-      <!-- SKILLS -->
-      <section id="skills-section">
-        <h2 id="skills-title"></h2>
-        <div id="skills-list" class="skills-grid"></div>
-      </section>
-    </main>
+    <main id="page-main"></main>
   </div>
 
   {{I18N_DATA}}

@@ -7,12 +7,13 @@ const {
 } = require('./render-portfolio');
 
 const data = loadData();
-const { html, robotsTxt, sitemapXml } = renderWebHtml(data);
+const { html, technicalHtml, robotsTxt, sitemapXml } = renderWebHtml(data);
 
 ensureDir('dist');
 copyStaticAssets();
 writeOutput('dist/index.html', html);
+writeOutput('dist/portfolio.html', technicalHtml);
 writeOutput('dist/robots.txt', robotsTxt);
 writeOutput('dist/sitemap.xml', sitemapXml);
 
-console.log('✅ Portfolio generated!');
+console.log('✅ Resume and portfolio pages generated!');

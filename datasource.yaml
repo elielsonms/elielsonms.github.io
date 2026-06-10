@@ -47,6 +47,7 @@ locales:
       certifications: Certifications & Awards
       skills: Skills
       pdf_resume: PDF Resume
+      full_portfolio_pdf: Full Portfolio PDF
       github: GitHub
       highlights: Highlights
       portfolio_link: Portfolio
@@ -317,6 +318,7 @@ locales:
       certifications: Certificações e Premiações
       skills: Habilidades
       pdf_resume: Currículo em PDF
+      full_portfolio_pdf: Portfólio Completo em PDF
       github: GitHub
       highlights: Destaques
       portfolio_link: Portfólio

@@ -61,8 +61,15 @@ function slugifyFileName(value) {
     .replace(/^-+|-+$/g, '');
 }
 
-function buildPdfFileName(name) {
-  return `${slugifyFileName(name)}.pdf`;
+function buildPdfFileName(name, variant = '') {
+  const baseFileName = `${slugifyFileName(name)}.pdf`;
+
+  if (!variant) {
+    return baseFileName;
+  }
+
+  const extensionIndex = baseFileName.lastIndexOf('.');
+  return `${baseFileName.slice(0, extensionIndex)}-${variant}${baseFileName.slice(extensionIndex)}`;
 }
 
 function normalizeBaseUrl(url) {
@@ -371,8 +378,8 @@ function resolveLocaleData(data, locale) {
   };
 }
 
-function buildLocalizedPdfFileName(name, locale, defaultLocale) {
-  const baseFileName = buildPdfFileName(name);
+function buildLocalizedPdfFileName(name, locale, defaultLocale, variant = '') {
+  const baseFileName = buildPdfFileName(name, variant);
   if (locale === defaultLocale) {
     return baseFileName;
   }
@@ -518,7 +525,7 @@ function buildPortfolioMainHtml(resolved) {
   ].join('');
 }
 
-function buildHeaderHtml({ resolved, locale, pageMode, supportedLocales, pdfFileName }) {
+function buildHeaderHtml({ resolved, locale, pageMode, supportedLocales, pdfFileNames }) {
   const labels = resolved.labels || {};
   const isResumePage = pageMode === 'resume';
   const pageEyebrow = isResumePage
@@ -534,10 +541,25 @@ function buildHeaderHtml({ resolved, locale, pageMode, supportedLocales, pdfFile
       ${escapeHtml(labels.github || 'GitHub')}
     </a>`
     : '';
-  const downloadHtml = `
-    <a href="./${escapeHtml(pdfFileName)}" class="inline-link subtle-link" download target="_blank" data-analytics-link="resume_pdf">
-      ${escapeHtml(labels.pdf_resume || 'PDF Resume')}
-    </a>`;
+  const resumePdfFileName = pdfFileNames.resume;
+  const portfolioPdfFileName = pdfFileNames.portfolio;
+  const downloadLinks = isResumePage
+    ? [
+      `<a href="./${escapeHtml(resumePdfFileName)}" class="inline-link subtle-link" download target="_blank" data-analytics-link="resume_pdf">
+        ${escapeHtml(labels.pdf_resume || 'PDF Resume')}
+      </a>`,
+      `<a href="./${escapeHtml(portfolioPdfFileName)}" class="inline-link subtle-link" download target="_blank" data-analytics-link="portfolio_pdf">
+        ${escapeHtml(labels.full_portfolio_pdf || 'Full Portfolio PDF')}
+      </a>`
+    ]
+    : [
+      `<a href="./${escapeHtml(portfolioPdfFileName)}" class="inline-link subtle-link" download target="_blank" data-analytics-link="portfolio_pdf">
+        ${escapeHtml(labels.full_portfolio_pdf || 'Full Portfolio PDF')}
+      </a>`,
+      `<a href="./${escapeHtml(resumePdfFileName)}" class="inline-link subtle-link" download target="_blank" data-analytics-link="resume_pdf">
+        ${escapeHtml(labels.pdf_resume || 'PDF Resume')}
+      </a>`
+    ];
 
   return `
   <div class="header-left">
@@ -552,7 +574,7 @@ function buildHeaderHtml({ resolved, locale, pageMode, supportedLocales, pdfFile
         ${escapeHtml(pageSwitchLabel)}
       </a>
       ${githubHtml}
-      ${downloadHtml}
+      ${downloadLinks.join('')}
     </div>
   </div>
   <div class="header-right">
@@ -581,7 +603,11 @@ function buildHeaderHtml({ resolved, locale, pageMode, supportedLocales, pdfFile
 function buildPageView(data, locale, pageMode) {
   const resolved = resolveLocaleData(data, locale);
   const defaultLocale = getDefaultLocale(data);
-  const pdfFileName = buildLocalizedPdfFileName(resolved.header.name, locale, defaultLocale);
+  const pdfFileNames = {
+    resume: buildLocalizedPdfFileName(resolved.header.name, locale, defaultLocale, 'resume'),
+    portfolio: buildLocalizedPdfFileName(resolved.header.name, locale, defaultLocale, 'portfolio')
+  };
+  const pdfFileName = pageMode === 'resume' ? pdfFileNames.resume : pdfFileNames.portfolio;
   const site = resolved.site || {};
   const labels = resolved.labels || {};
   const baseCanonicalUrl = normalizeBaseUrl(site.url || resolved.header.portfolio);
@@ -604,7 +630,7 @@ function buildPageView(data, locale, pageMode) {
     locale,
     pageMode,
     supportedLocales,
-    pdfFileName
+    pdfFileNames
   });
   const mainHtml = pageMode === 'resume'
     ? buildResumeMainHtml(resolved)
@@ -622,6 +648,7 @@ function buildPageView(data, locale, pageMode) {
     socialImage,
     pdfFileName,
     labels,
+    pdfFileNames,
     sections: {
       header: headerHtml,
       main: mainHtml

@@ -26,8 +26,17 @@ def slugify_file_name(value: str) -> str:
     return f"{slug}.pdf"
 
 
-def build_localized_pdf_file_name(name: str, locale: str, default_locale: str) -> str:
+def build_pdf_file_name(name: str, variant: str = "") -> str:
     base_file_name = slugify_file_name(name)
+    if not variant:
+        return base_file_name
+
+    stem, suffix = base_file_name.rsplit(".", 1)
+    return f"{stem}-{variant}.{suffix}"
+
+
+def build_localized_pdf_file_name(name: str, locale: str, default_locale: str, variant: str = "") -> str:
+    base_file_name = build_pdf_file_name(name, variant)
     if locale == default_locale:
         return base_file_name
 
@@ -410,6 +419,76 @@ def build_inline_links(urls: list[tuple[str, str]], styles):
     return table
 
 
+def build_pdf_variant_story(resolved: dict, labels: dict, locale: str, variant: str, styles):
+    is_full_portfolio = variant == "portfolio"
+    summary_text = resolved["summary"] if is_full_portfolio else resolved["resume_summary"]
+    experience_items = resolved["experience"] if is_full_portfolio else resolved["resume_experience"]
+    skills_items = resolved["skills"] if is_full_portfolio else resolved["resume_skills"]
+    experience_title = labels.get("experience", "Experience") if is_full_portfolio else labels.get("selected_experience", labels.get("experience", "Experience"))
+    title_label = labels.get("technical_portfolio", "Technical Portfolio") if is_full_portfolio else labels.get("resume_title", "Resume")
+
+    story = []
+    story.append(
+        two_column_header(
+            Paragraph(escape(resolved["header"]["name"]), styles["name"]),
+            [
+                Paragraph(escape(resolved["header"]["title"]), styles["title"]),
+                build_inline_links(
+                    [
+                        ("GitHub", f"https://github.com/{resolved['header']['github']}"),
+                        (labels.get("portfolio_link", "Portfolio"), resolved["header"].get("portfolio", "")),
+                    ] if resolved["header"].get("portfolio", "") else [("GitHub", f"https://github.com/{resolved['header']['github']}")],
+                    styles,
+                ),
+            ],
+            [
+                Paragraph(escape(resolved["header"]["location"]), styles["contact_right"]),
+                Paragraph(escape(f"{resolved['header']['email_parts'][0]}@{resolved['header']['email_parts'][1]}"), styles["contact_right"]),
+                Paragraph(f"WhatsApp: +{escape(resolved['header']['whatsapp'])}", styles["contact_right"]),
+            ],
+        )
+    )
+    story.append(Spacer(1, 6))
+    story.append(HRFlowable(thickness=0.8, color=colors.HexColor("#94a3b8"), spaceBefore=0, spaceAfter=6))
+    story.extend(section_title(labels.get("about", "Summary"), styles))
+    story.append(Paragraph(escape(summary_text), styles["body"]))
+    story.extend(section_title(experience_title, styles))
+    story.extend(build_experience(experience_items, styles, labels.get("highlights", "Highlights"), locale))
+
+    lower_table = Table(
+        [[
+            build_education(labels.get("education", "Education"), resolved["education"], styles),
+            build_simple_list(labels.get("skills", "Skills"), skills_items, styles, columns=2),
+        ]],
+        colWidths=[88 * mm, 92 * mm],
+    )
+    lower_table.setStyle(
+        TableStyle(
+            [
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+                ("TOPPADDING", (0, 0), (-1, -1), 0),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+            ]
+        )
+    )
+    story.append(lower_table)
+    story.extend(
+        build_simple_list(
+            labels.get("certifications", "Certifications"),
+            resolved["certifications"],
+            styles,
+            link=(
+                labels.get("credly_badges", "View badge profile on Credly"),
+                resolved["header"].get("credly_badges", ""),
+            ) if resolved["header"].get("credly_badges") else None,
+        )
+    )
+
+    return story, title_label
+
+
 def main() -> None:
     data = yaml.safe_load((ROOT / "datasource.yaml").read_text(encoding="utf-8"))
     DIST_DIR.mkdir(exist_ok=True)
@@ -419,85 +498,25 @@ def main() -> None:
     for locale in get_supported_locales(data):
         resolved = resolve_locale_data(data, locale)
         labels = resolved["labels"]
-        pdf_file_name = build_localized_pdf_file_name(resolved["header"]["name"], locale, default_locale)
-        output_path = DIST_DIR / pdf_file_name
         styles = get_styles()
-        email = f"{resolved['header']['email_parts'][0]}@{resolved['header']['email_parts'][1]}"
-        github_url = f"https://github.com/{resolved['header']['github']}"
-        portfolio_url = resolved["header"].get("portfolio", "")
+        for variant in ("resume", "portfolio"):
+            pdf_file_name = build_localized_pdf_file_name(resolved["header"]["name"], locale, default_locale, variant)
+            output_path = DIST_DIR / pdf_file_name
+            story, title_label = build_pdf_variant_story(resolved, labels, locale, variant, styles)
 
-        doc = SimpleDocTemplate(
-            str(output_path),
-            pagesize=A4,
-            leftMargin=13 * mm,
-            rightMargin=13 * mm,
-            topMargin=12 * mm,
-            bottomMargin=12 * mm,
-            title=f"{resolved['header']['name']} {labels.get('resume_title', 'Resume')}",
-            author=resolved["header"]["name"],
-        )
-
-        story = []
-        story.append(
-            two_column_header(
-                Paragraph(escape(resolved["header"]["name"]), styles["name"]),
-                [
-                    Paragraph(escape(resolved["header"]["title"]), styles["title"]),
-                    build_inline_links(
-                        [
-                            ("GitHub", github_url),
-                            (labels.get("portfolio_link", "Portfolio"), portfolio_url),
-                        ] if portfolio_url else [("GitHub", github_url)],
-                        styles,
-                    ),
-                ],
-                [
-                    Paragraph(escape(resolved["header"]["location"]), styles["contact_right"]),
-                    Paragraph(escape(email), styles["contact_right"]),
-                    Paragraph(f"WhatsApp: +{escape(resolved['header']['whatsapp'])}", styles["contact_right"]),
-                ],
+            doc = SimpleDocTemplate(
+                str(output_path),
+                pagesize=A4,
+                leftMargin=13 * mm,
+                rightMargin=13 * mm,
+                topMargin=12 * mm,
+                bottomMargin=12 * mm,
+                title=f"{resolved['header']['name']} {title_label}",
+                author=resolved["header"]["name"],
             )
-        )
-        story.append(Spacer(1, 6))
-        story.append(HRFlowable(thickness=0.8, color=colors.HexColor("#94a3b8"), spaceBefore=0, spaceAfter=6))
-        story.extend(section_title(labels.get("about", "Summary"), styles))
-        story.append(Paragraph(escape(resolved["resume_summary"]), styles["body"]))
-        story.extend(section_title(labels.get("selected_experience", labels.get("experience", "Experience")), styles))
-        story.extend(build_experience(resolved["resume_experience"], styles, labels.get("highlights", "Highlights"), locale))
 
-        lower_table = Table(
-            [[
-                build_education(labels.get("education", "Education"), resolved["education"], styles),
-                build_simple_list(labels.get("skills", "Skills"), resolved["resume_skills"], styles, columns=2),
-            ]],
-            colWidths=[88 * mm, 92 * mm],
-        )
-        lower_table.setStyle(
-            TableStyle(
-                [
-                    ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                    ("LEFTPADDING", (0, 0), (-1, -1), 0),
-                    ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-                    ("TOPPADDING", (0, 0), (-1, -1), 0),
-                    ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
-                ]
-            )
-        )
-        story.append(lower_table)
-        story.extend(
-            build_simple_list(
-                labels.get("certifications", "Certifications"),
-                resolved["certifications"],
-                styles,
-                link=(
-                    labels.get("credly_badges", "View badge profile on Credly"),
-                    resolved["header"].get("credly_badges", ""),
-                ) if resolved["header"].get("credly_badges") else None,
-            )
-        )
-
-        doc.build(story)
-        print(f"✅ PDF generated: {pdf_file_name}")
+            doc.build(story)
+            print(f"✅ PDF generated: {pdf_file_name}")
 
 
 if __name__ == "__main__":

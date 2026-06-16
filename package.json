@@ -2,9 +2,21 @@
   "name": "elielsonms-github-io",
   "private": true,
   "scripts": {
-    "build:clean": "rm -rf dist && mkdir -p dist/styles dist/scripts",
-    "build:html": "node scripts/generate-html.js",
+    "build:clean": "rm -rf dist src/generated && mkdir -p dist/styles dist/scripts",
+    "build:data": "node scripts/generate-data.js",
+    "build:web": "node scripts/build-web.js",
+    "build:assets": "node scripts/copy-static-assets.js",
+    "build:seo": "node scripts/generate-seo-files.js",
     "build:pdf": "sh scripts/run-python.sh scripts/generate_pdf.py",
-    "build": "npm run build:clean && npm run build:html && npm run build:pdf"
+    "build": "npm run build:clean && npm run build:data && npm run build:web && npm run build:assets && npm run build:seo && npm run build:pdf",
+    "preview": "serve dist -l 4173"
+  },
+  "dependencies": {
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1",
+    "serve": "^14.2.6"
   }
 }

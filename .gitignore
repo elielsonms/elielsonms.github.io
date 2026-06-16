@@ -3,5 +3,6 @@ node_modules/
 .venv/
 .cache/
 dist/
+src/generated/
 __pycache__/
 *.py[cod]

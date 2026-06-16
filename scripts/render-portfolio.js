@@ -1,6 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const React = require('react');
+const { renderToStaticMarkup } = require('react-dom/server');
+
+const h = React.createElement;
 
 function loadData() {
   const output = execFileSync(
@@ -108,16 +112,6 @@ function applyTemplateReplacements(template, replacements) {
   return Object.entries(replacements).reduce((html, [token, value]) => {
     return html.split(token).join(value);
   }, template);
-}
-
-function obfuscateEmail(parts) {
-  const [localPart, domain] = parts;
-  const email = `${localPart}@${domain}`;
-  const obfuscatedEmail = email.split('').join('&#8203;');
-  const localCodes = localPart.split('').map(char => char.charCodeAt(0)).join(',');
-  const domainCodes = domain.split('').map(char => char.charCodeAt(0)).join(',');
-
-  return `<span class="email-obfuscated" data-local-codes="${localCodes}" data-domain-codes="${domainCodes}">${obfuscatedEmail}</span>`;
 }
 
 function parsePeriodMonthYear(period, locale) {
@@ -229,70 +223,108 @@ function formatDurationFromPeriod(period, locale, fallbackDuration = '') {
   return `${months} ${months === 1 ? 'month' : 'months'}`;
 }
 
+function obfuscateEmail(parts) {
+  const [localPart, domain] = parts;
+  const email = `${localPart}@${domain}`;
+  const obfuscatedEmail = email.split('').join('\u200B');
+  const localCodes = localPart.split('').map(char => char.charCodeAt(0)).join(',');
+  const domainCodes = domain.split('').map(char => char.charCodeAt(0)).join(',');
+
+  return h(
+    'span',
+    {
+      className: 'email-obfuscated',
+      'data-local-codes': localCodes,
+      'data-domain-codes': domainCodes
+    },
+    obfuscatedEmail
+  );
+}
+
 function renderExperienceItems(experience, options = {}) {
   const highlightsLabel = options.highlightsLabel || 'Highlights';
   const locale = options.locale || 'en_US';
 
   return experience.map(exp => {
     const highlights = Array.isArray(exp.highlights) ? exp.highlights : [];
-    const highlightsHtml = highlights.length > 0
-      ? `
-    <div class="highlights-label">${escapeHtml(highlightsLabel)}</div>
-    <div class="highlights">
-      ${highlights.map(h => `<span class="highlight">${escapeHtml(h)}</span>`).join('')}
-    </div>`
-      : '';
-
     const computedDuration = formatDurationFromPeriod(exp.period, locale, exp.duration);
     const periodText = options.showDuration && computedDuration
       ? `${exp.period} · ${computedDuration}`
       : exp.period;
 
-    return `
-  <div class="experience-item">
-    <div class="exp-header">
-      <div>
-        <div class="exp-title">${escapeHtml(exp.title)}</div>
-        <div class="exp-company">${escapeHtml(exp.company)}</div>
-      </div>
-      <div class="exp-period-wrap">
-        <div class="exp-period">${escapeHtml(periodText)}</div>
-      </div>
-    </div>
-    <div class="exp-description">${escapeHtml(exp.description)}</div>${highlightsHtml}
-  </div>`;
-  }).join('');
+    return h(
+      'div',
+      { className: 'experience-item', key: `${exp.company}-${exp.title}-${exp.period}` },
+      h(
+        'div',
+        { className: 'exp-header' },
+        h(
+          'div',
+          null,
+          h('div', { className: 'exp-title' }, exp.title),
+          h('div', { className: 'exp-company' }, exp.company)
+        ),
+        h(
+          'div',
+          { className: 'exp-period-wrap' },
+          h('div', { className: 'exp-period' }, periodText)
+        )
+      ),
+      h('div', { className: 'exp-description' }, exp.description),
+      highlights.length > 0
+        ? h(
+            React.Fragment,
+            null,
+            h('div', { className: 'highlights-label' }, highlightsLabel),
+            h(
+              'div',
+              { className: 'highlights' },
+              highlights.map(item => h('span', { className: 'highlight', key: item }, item))
+            )
+          )
+        : null
+    );
+  });
 }
 
 function renderEducationItems(education) {
-  return education.map(edu => `
-  <div class="edu-item">
-    <div class="edu-degree">${escapeHtml(edu.degree)}</div>
-    <div class="edu-institution">${escapeHtml(edu.institution)}</div>
-    <div class="edu-year">${escapeHtml(edu.year)}</div>
-  </div>`).join('');
+  return education.map(edu => h(
+    'div',
+    { className: 'edu-item', key: `${edu.degree}-${edu.institution}-${edu.year}` },
+    h('div', { className: 'edu-degree' }, edu.degree),
+    h('div', { className: 'edu-institution' }, edu.institution),
+    h('div', { className: 'edu-year' }, edu.year)
+  ));
 }
 
 function renderCertifications(certifications, className = 'cert-item') {
-  return certifications.map(cert => `
-  <div class="${className}">${escapeHtml(cert)}</div>`).join('');
+  return certifications.map(cert => h('div', { className, key: cert }, cert));
 }
 
 function renderCertificationsSection(resolved) {
   const labels = resolved.labels || {};
   const credlyUrl = resolved.header?.credly_badges;
-  const credlyHtml = credlyUrl
-    ? `<a class="certifications-link" href="${escapeHtml(credlyUrl)}" target="_blank" rel="noreferrer">`
-      + `${escapeHtml(labels.credly_badges || 'View badge profile on Credly')}`
-      + `</a>`
-    : '';
-
-  return `${credlyHtml}<div class="cert-list">${renderCertifications(resolved.certifications)}</div>`;
+  return h(
+    React.Fragment,
+    null,
+    credlyUrl
+      ? h(
+          'a',
+          {
+            className: 'certifications-link',
+            href: credlyUrl,
+            target: '_blank',
+            rel: 'noreferrer'
+          },
+          labels.credly_badges || 'View badge profile on Credly'
+        )
+      : null,
+    h('div', { className: 'cert-list' }, renderCertifications(resolved.certifications))
+  );
 }
 
 function renderSkills(skills, tagName = 'span') {
-  return skills.map(skill => `
-  <${tagName} class="skill">${escapeHtml(skill)}</${tagName}>`).join('');
+  return skills.map(skill => h(tagName, { className: 'skill', key: skill }, skill));
 }
 
 function buildAnalyticsHead(data) {
@@ -413,33 +445,36 @@ function renderLanguageSwitcher(supportedLocales, activeLocale) {
     pt_BR: 'PT'
   };
 
-  return `
-    <div class="language-switcher" role="group" aria-label="Language switcher">
-      ${supportedLocales.map(locale => `
-        <button
-          type="button"
-          class="language-button${locale === activeLocale ? ' is-active' : ''}"
-          data-locale-button="${escapeHtml(locale)}"
-          aria-pressed="${locale === activeLocale ? 'true' : 'false'}"
-        >
-          ${escapeHtml(localeLabels[locale] || locale)}
-        </button>`).join('')}
-    </div>`;
+  return h(
+    'div',
+    { className: 'language-switcher', role: 'group', 'aria-label': 'Language switcher' },
+    supportedLocales.map(locale => h(
+      'button',
+      {
+        key: locale,
+        type: 'button',
+        className: `language-button${locale === activeLocale ? ' is-active' : ''}`,
+        'data-locale-button': locale,
+        'aria-pressed': locale === activeLocale ? 'true' : 'false'
+      },
+      localeLabels[locale] || locale
+    ))
+  );
 }
 
-function renderSection(title, content, className = '') {
+function renderSection(title, content, className = '', key = '') {
   const sectionClass = className ? `content-section ${className}` : 'content-section';
 
-  return `
-    <section class="${sectionClass}">
-      <h2>${escapeHtml(title)}</h2>
-      ${content}
-    </section>`;
+  return h(
+    'section',
+    { className: sectionClass, key },
+    h('h2', null, title),
+    content
+  );
 }
 
 function renderStrengthCards(items) {
-  return items.map(item => `
-    <article class="strength-card">${escapeHtml(item)}</article>`).join('');
+  return items.map(item => h('article', { className: 'strength-card', key: item }, item));
 }
 
 function buildResumeMainHtml(resolved) {
@@ -450,45 +485,68 @@ function buildResumeMainHtml(resolved) {
   return [
     renderSection(
       labels.about || 'About',
-      `<div class="summary summary-compact">${escapeHtml(resolved.resumeSummary)}</div>
-      <div class="view-switch-banner">
-        <div>
-          <div class="view-switch-title">${escapeHtml(technicalPageBlurb)}</div>
-          <p class="view-switch-copy">${escapeHtml(labels.technical_portfolio_copy || 'Architecture, delivery details, broader stack, and full work history are available on a separate page.')}</p>
-        </div>
-        <a href="./portfolio.html" class="primary-link-pill" data-analytics-link="technical_portfolio">
-          ${escapeHtml(technicalPageLabel)}
-        </a>
-      </div>`
+      h(
+        React.Fragment,
+        null,
+        h('div', { className: 'summary summary-compact' }, resolved.resumeSummary),
+        h(
+          'div',
+          { className: 'view-switch-banner' },
+          h(
+            'div',
+            null,
+            h('div', { className: 'view-switch-title' }, technicalPageBlurb),
+            h('p', { className: 'view-switch-copy' }, labels.technical_portfolio_copy || 'Architecture, delivery details, broader stack, and full work history are available on a separate page.')
+          ),
+          h(
+            'a',
+            {
+              href: './portfolio.html',
+              className: 'primary-link-pill',
+              'data-analytics-link': 'technical_portfolio'
+            },
+            technicalPageLabel
+          )
+        )
+      ),
+      '',
+      'about'
     ),
     renderSection(
       labels.core_strengths || 'Core Strengths',
-      `<div class="strength-grid">${renderStrengthCards(resolved.resumeHighlights)}</div>`
+      h('div', { className: 'strength-grid' }, renderStrengthCards(resolved.resumeHighlights)),
+      '',
+      'core-strengths'
     ),
     renderSection(
       labels.selected_experience || labels.experience || 'Selected Experience',
-      renderExperienceItems(resolved.resumeExperience, {
+      h('div', { className: 'experience-list' }, renderExperienceItems(resolved.resumeExperience, {
         highlightsLabel: labels.highlights || 'Highlights',
         showDuration: true,
         locale: resolved.locale
-      }),
-      'section-experience'
+      })),
+      'section-experience',
+      'selected-experience'
     ),
     renderSection(
       labels.skills || 'Skills',
-      `<div class="skills-grid">${renderSkills(resolved.resumeSkills)}</div>`
+      h('div', { className: 'skills-grid' }, renderSkills(resolved.resumeSkills)),
+      '',
+      'skills'
     ),
     renderSection(
       labels.education || 'Education',
-      renderEducationItems(resolved.education),
-      'section-education'
+      h('div', { className: 'education-list' }, renderEducationItems(resolved.education)),
+      'section-education',
+      'education'
     ),
     renderSection(
       labels.certifications || 'Certifications & Awards',
       renderCertificationsSection(resolved),
-      'section-certifications'
+      'section-certifications',
+      'certifications'
     )
-  ].join('');
+  ];
 }
 
 function buildPortfolioMainHtml(resolved) {
@@ -497,32 +555,39 @@ function buildPortfolioMainHtml(resolved) {
   return [
     renderSection(
       labels.about || 'About',
-      `<div class="summary">${escapeHtml(resolved.summary)}</div>`
+      h('div', { className: 'summary' }, resolved.summary),
+      '',
+      'about'
     ),
     renderSection(
       labels.experience || 'Experience',
-      renderExperienceItems(resolved.experience, {
+      h('div', { className: 'experience-list' }, renderExperienceItems(resolved.experience, {
         highlightsLabel: labels.highlights || 'Highlights',
         showDuration: true,
         locale: resolved.locale
-      }),
-      'section-experience'
+      })),
+      'section-experience',
+      'experience'
     ),
     renderSection(
       labels.skills || 'Skills',
-      `<div class="skills-grid">${renderSkills(resolved.skills)}</div>`
+      h('div', { className: 'skills-grid' }, renderSkills(resolved.skills)),
+      '',
+      'skills'
     ),
     renderSection(
       labels.education || 'Education',
-      renderEducationItems(resolved.education),
-      'section-education'
+      h('div', { className: 'education-list' }, renderEducationItems(resolved.education)),
+      'section-education',
+      'education'
     ),
     renderSection(
       labels.certifications || 'Certifications & Awards',
       renderCertificationsSection(resolved),
-      'section-certifications'
+      'section-certifications',
+      'certifications'
     )
-  ].join('');
+  ];
 }
 
 function buildHeaderHtml({ resolved, locale, pageMode, supportedLocales, pdfFileNames }) {
@@ -535,69 +600,145 @@ function buildHeaderHtml({ resolved, locale, pageMode, supportedLocales, pdfFile
   const pageSwitchLabel = isResumePage
     ? (labels.view_technical_portfolio || 'View technical portfolio')
     : (labels.back_to_resume || 'Back to resume');
-  const githubHtml = resolved.header.github
-    ? `
-    <a href="https://github.com/${escapeHtml(resolved.header.github)}" class="inline-link subtle-link" target="_blank" rel="noopener" data-analytics-link="github">
-      ${escapeHtml(labels.github || 'GitHub')}
-    </a>`
-    : '';
   const resumePdfFileName = pdfFileNames.resume;
   const portfolioPdfFileName = pdfFileNames.portfolio;
+  const githubLink = resolved.header.github
+    ? h(
+        'a',
+        {
+          href: `https://github.com/${resolved.header.github}`,
+          className: 'inline-link subtle-link',
+          target: '_blank',
+          rel: 'noopener',
+          'data-analytics-link': 'github'
+        },
+        labels.github || 'GitHub'
+      )
+    : null;
   const downloadLinks = isResumePage
     ? [
-      `<a href="./${escapeHtml(resumePdfFileName)}" class="inline-link subtle-link" download target="_blank" data-analytics-link="resume_pdf">
-        ${escapeHtml(labels.pdf_resume || 'PDF Resume')}
-      </a>`,
-      `<a href="./${escapeHtml(portfolioPdfFileName)}" class="inline-link subtle-link" download target="_blank" data-analytics-link="portfolio_pdf">
-        ${escapeHtml(labels.full_portfolio_pdf || 'Full Portfolio PDF')}
-      </a>`
-    ]
+        h(
+          'a',
+          {
+            href: `./${resumePdfFileName}`,
+            className: 'inline-link subtle-link',
+            download: true,
+            target: '_blank',
+            'data-analytics-link': 'resume_pdf',
+            key: 'resume-pdf'
+          },
+          labels.pdf_resume || 'PDF Resume'
+        ),
+        h(
+          'a',
+          {
+            href: `./${portfolioPdfFileName}`,
+            className: 'inline-link subtle-link',
+            download: true,
+            target: '_blank',
+            'data-analytics-link': 'portfolio_pdf',
+            key: 'portfolio-pdf'
+          },
+          labels.full_portfolio_pdf || 'Full Portfolio PDF'
+        )
+      ]
     : [
-      `<a href="./${escapeHtml(portfolioPdfFileName)}" class="inline-link subtle-link" download target="_blank" data-analytics-link="portfolio_pdf">
-        ${escapeHtml(labels.full_portfolio_pdf || 'Full Portfolio PDF')}
-      </a>`,
-      `<a href="./${escapeHtml(resumePdfFileName)}" class="inline-link subtle-link" download target="_blank" data-analytics-link="resume_pdf">
-        ${escapeHtml(labels.pdf_resume || 'PDF Resume')}
-      </a>`
-    ];
+        h(
+          'a',
+          {
+            href: `./${portfolioPdfFileName}`,
+            className: 'inline-link subtle-link',
+            download: true,
+            target: '_blank',
+            'data-analytics-link': 'portfolio_pdf',
+            key: 'portfolio-pdf'
+          },
+          labels.full_portfolio_pdf || 'Full Portfolio PDF'
+        ),
+        h(
+          'a',
+          {
+            href: `./${resumePdfFileName}`,
+            className: 'inline-link subtle-link',
+            download: true,
+            target: '_blank',
+            'data-analytics-link': 'resume_pdf',
+            key: 'resume-pdf'
+          },
+          labels.pdf_resume || 'PDF Resume'
+        )
+      ];
 
-  return `
-  <div class="header-left">
-    <div class="header-eyebrow-row">
-      <div class="header-eyebrow">${escapeHtml(pageEyebrow)}</div>
-      ${renderLanguageSwitcher(supportedLocales, locale)}
-    </div>
-    <h1>${escapeHtml(resolved.header.name)}</h1>
-    <p class="header-role">${escapeHtml(resolved.header.title)}</p>
-    <div class="header-secondary-links">
-      <a href="${pageSwitchHref}" class="inline-link primary-subtle-link" data-analytics-link="${isResumePage ? 'technical_portfolio' : 'resume_page'}">
-        ${escapeHtml(pageSwitchLabel)}
-      </a>
-      ${githubHtml}
-      ${downloadLinks.join('')}
-    </div>
-  </div>
-  <div class="header-right">
-    <div class="header-meta">
-      <div class="header-meta-item">
-        <span class="meta-label">${escapeHtml(labels.location || 'Location')}</span>
-        <span class="meta-value">${escapeHtml(resolved.header.location)}</span>
-      </div>
-      <div class="header-meta-item">
-        <span class="meta-label">${escapeHtml(labels.email || 'Email')}</span>
-        <span class="meta-value">${obfuscateEmail(resolved.header.email_parts)}</span>
-      </div>
-      <div class="header-meta-item">
-        <span class="meta-label">${escapeHtml(labels.whatsapp || 'WhatsApp')}</span>
-        <span class="meta-value">
-          <a href="https://wa.me/${escapeHtml(resolved.header.whatsapp)}" class="meta-link" target="_blank" rel="noopener">
-            +${escapeHtml(resolved.header.whatsapp)}
-          </a>
-        </span>
-      </div>
-    </div>
-  </div>
-`;
+  return h(
+    React.Fragment,
+    null,
+    h(
+      'div',
+      { className: 'header-left' },
+      h(
+        'div',
+        { className: 'header-eyebrow-row' },
+        h('div', { className: 'header-eyebrow' }, pageEyebrow),
+        renderLanguageSwitcher(supportedLocales, locale)
+      ),
+      h('h1', null, resolved.header.name),
+      h('p', { className: 'header-role' }, resolved.header.title),
+      h(
+        'div',
+        { className: 'header-secondary-links' },
+        h(
+          'a',
+          {
+            href: pageSwitchHref,
+            className: 'inline-link primary-subtle-link',
+            'data-analytics-link': isResumePage ? 'technical_portfolio' : 'resume_page'
+          },
+          pageSwitchLabel
+        ),
+        githubLink,
+        ...downloadLinks
+      )
+    ),
+    h(
+      'div',
+      { className: 'header-right' },
+      h(
+        'div',
+        { className: 'header-meta' },
+        h(
+          'div',
+          { className: 'header-meta-item' },
+          h('span', { className: 'meta-label' }, labels.location || 'Location'),
+          h('span', { className: 'meta-value' }, resolved.header.location)
+        ),
+        h(
+          'div',
+          { className: 'header-meta-item' },
+          h('span', { className: 'meta-label' }, labels.email || 'Email'),
+          h('span', { className: 'meta-value' }, obfuscateEmail(resolved.header.email_parts))
+        ),
+        h(
+          'div',
+          { className: 'header-meta-item' },
+          h('span', { className: 'meta-label' }, labels.whatsapp || 'WhatsApp'),
+          h(
+            'span',
+            { className: 'meta-value' },
+            h(
+              'a',
+              {
+                href: `https://wa.me/${resolved.header.whatsapp}`,
+                className: 'meta-link',
+                target: '_blank',
+                rel: 'noopener'
+              },
+              `+${resolved.header.whatsapp}`
+            )
+          )
+        )
+      )
+    )
+  );
 }
 
 function buildPageView(data, locale, pageMode) {
@@ -650,8 +791,8 @@ function buildPageView(data, locale, pageMode) {
     labels,
     pdfFileNames,
     sections: {
-      header: headerHtml,
-      main: mainHtml
+      header: renderToStaticMarkup(headerHtml),
+      main: renderToStaticMarkup(h('main', null, mainHtml))
     }
   };
 }
